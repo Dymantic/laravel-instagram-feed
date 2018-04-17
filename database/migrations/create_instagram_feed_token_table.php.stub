@@ -14,7 +14,6 @@ class CreateInstagramFeedTokenTable extends Migration
         Schema::create('dymantic_instagram_feed_tokens', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('profile_id');
-            $table->string('profile_type');
             $table->string('access_code');
             $table->string('username');
             $table->string('user_id');
@@ -23,6 +22,7 @@ class CreateInstagramFeedTokenTable extends Migration
             $table->nullableTimestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */

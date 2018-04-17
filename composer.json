@@ -9,7 +9,9 @@
             "email": "joyner.michael@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "guzzlehttp/guzzle": "^6.3"
+    },
     "require-dev": {
         "orchestra/testbench": "^3.6"
     },
