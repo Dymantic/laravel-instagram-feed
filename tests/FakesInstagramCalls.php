@@ -51,11 +51,13 @@ trait FakesInstagramCalls
     private function validTokenDetails()
     {
         return [
-            'access_code'          => 'VALID_ACCESS_TOKEN',
-            'username'             => 'TEST USERNAME',
-            'user_id'              => 'TEST USER_ID',
-            'user_fullname'        => 'TEST_USER_FULLNAME',
-            'user_profile_picture' => 'https://test.test/avatar'
+            'access_token' => 'TEST_TOKEN_CODE',
+            'user' => [
+                'id' => 'TEST ID',
+                'username' => 'TEST_USERNAME',
+                'full_name' => 'TEST FULL NAME',
+                'profile_picture' => 'TEST AVATAR'
+            ]
         ];
     }
 }

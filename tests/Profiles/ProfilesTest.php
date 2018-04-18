@@ -10,6 +10,7 @@ use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Mail;
 
 class ProfilesTest extends TestCase
 {
@@ -45,28 +46,31 @@ class ProfilesTest extends TestCase
     public function a_profile_can_generate_the_correct_auth_init_url()
     {
         $client_id = 'TEST_CLIENT_ID';
-        $redirect_uri_base = 'TEST_REDIRECT_URI';
+        $redirect_uri_base = 'instagram_test';
 
         $this->app['config']->set('instagram-feed.client_id', $client_id);
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.redirect_uri', $redirect_uri_base);
+        $this->app['config']->set('instagram-feed.auth_callback_route', $redirect_uri_base);
         $profile = Profile::create(['username' => 'test_user']);
 
-        $full_redirect_uri = "{$redirect_uri_base}?profile={$profile->id}";
+
+        $app_url = rtrim(config('app.url'), '/');
+        $full_redirect_uri = "{$app_url}/{$redirect_uri_base}?profile={$profile->id}";
 
         $expected = "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$full_redirect_uri&response_type=code";
 
         $this->assertEquals($expected, $profile->getInstagramAuthUrl());
     }
 
+
     /**
      * @test
      */
-    public function a_profile_can_request_an_access_token_from_a_successfull_auth_redirect()
+    public function a_profile_can_request_an_access_token_from_a_successful_auth_redirect()
     {
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.redirect_uri', 'https://test_instagram.test/instagram');
+        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
 
         $profile = Profile::create(['username' => 'test_user']);
 
@@ -77,7 +81,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "https://test_instagram.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willReturn($this->validTokenDetails());
@@ -90,11 +94,11 @@ class ProfilesTest extends TestCase
 
         $this->assertDatabaseHas('dymantic_instagram_feed_tokens', [
             'profile_id'           => $profile->id,
-            'access_code'          => 'VALID_ACCESS_TOKEN',
-            'username'             => 'TEST USERNAME',
-            'user_id'              => 'TEST USER_ID',
-            'user_fullname'        => 'TEST_USER_FULLNAME',
-            'user_profile_picture' => 'https://test.test/avatar'
+            'access_code'          => 'TEST_TOKEN_CODE',
+            'username'             => 'TEST_USERNAME',
+            'user_id'              => 'TEST ID',
+            'user_fullname'        => 'TEST FULL NAME',
+            'user_profile_picture' => 'TEST AVATAR'
         ]);
     }
 
@@ -105,7 +109,7 @@ class ProfilesTest extends TestCase
     {
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.redirect_uri', 'https://test_instagram.test/instagram');
+        $this->app['config']->set('instagram-feed.auth_callback_route', 'https://test_instagram.test/instagram');
 
         $profile = Profile::create(['username' => 'test_user']);
 
@@ -133,7 +137,7 @@ class ProfilesTest extends TestCase
     {
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.redirect_uri', 'https://test_instagram.test/instagram');
+        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
 
         $profile = Profile::create(['username' => 'test_user']);
 
@@ -144,7 +148,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "https://test_instagram.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());
@@ -170,11 +174,10 @@ class ProfilesTest extends TestCase
         $profile_with_token = Profile::create(['username' => 'profile one']);
         $profile_without_token = Profile::create(['username' => 'profile two']);
 
-        AccessToken::forceCreate(array_merge(['profile_id' => $profile_with_token->id], $this->validTokenDetails()));
+        AccessToken::createFromResponseArray($profile_with_token, $this->validTokenDetails());
 
         $this->assertTrue($profile_with_token->fresh()->hasInstagramAccess());
         $this->assertFalse($profile_without_token->fresh()->hasInstagramAccess());
     }
-
 
 }

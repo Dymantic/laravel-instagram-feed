@@ -16,7 +16,7 @@ class Instagram
     {
         $this->client_id = $config["client_id"];
         $this->client_secret = $config["client_secret"];
-        $this->redirect_uri = $config["redirect_uri"];
+        $this->redirect_uri = $config["auth_callback_route"];
 
         $this->http = $client;
     }
@@ -42,7 +42,8 @@ class Instagram
 
     private function redirectUriForProfile($profile_id)
     {
-        return $this->redirect_uri . '?profile=' . $profile_id;
+        $base = rtrim(config('app.url'), '/');
+        return "{$base}/{$this->redirect_uri}?profile={$profile_id}";
     }
 
 

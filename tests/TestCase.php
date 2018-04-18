@@ -53,6 +53,8 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('instagram-feed.auth_callback_route', 'instagram');
+        $app['config']->set('app.url', 'http://test.test');
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [

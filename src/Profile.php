@@ -40,6 +40,7 @@ class Profile extends Model
             throw new AccessTokenRequestException($e->getMessage());
         }
 
+
         return $this->setToken($token_details);
     }
 
@@ -47,7 +48,7 @@ class Profile extends Model
     {
         $this->tokens->each->delete();
 
-        return $this->tokens()->create($token_details);
+       return AccessToken::createFromResponseArray($this, $token_details);
     }
 
     public function hasInstagramAccess()

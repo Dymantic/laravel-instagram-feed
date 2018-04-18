@@ -21,14 +21,14 @@ class InstagramTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
 
-        $full_redirect_uri = 'https://test_redirect.test/instagram?profile=' . $profile->id;
+        $full_redirect_uri = 'http://test.test/instagram?profile=' . $profile->id;
 
         $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&response_type=code";
 
         $instagram = new Instagram([
             'client_id'     => 'TEST_CLIENT_ID',
             'client_secret' => 'TEST_CLIENT_SECRET',
-            'redirect_uri'  => 'https://test_redirect.test/instagram'
+            'auth_callback_route'  => 'instagram'
         ], app()->make(SimpleClient::class));
 
         $uri = $instagram->authUrlForProfile($profile);
@@ -39,7 +39,7 @@ class InstagramTest extends TestCase
     /**
      * @test
      */
-    public function it_makes_a_request_for_a_token_for_a_given_profile_after_a_sucessfull_auth_request()
+    public function it_makes_a_request_for_a_token_for_a_given_profile_after_a_successful_auth_request()
     {
         $profile = Profile::create(['username' => 'test_user']);
         $mockClient = $this->createMock(SimpleClient::class);
@@ -49,7 +49,7 @@ class InstagramTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "https://test_redirect.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willReturn($this->validTokenDetails());
@@ -57,7 +57,7 @@ class InstagramTest extends TestCase
         $instagram = new Instagram([
             'client_id'     => 'TEST_CLIENT_ID',
             'client_secret' => 'TEST_CLIENT_SECRET',
-            'redirect_uri'  => 'https://test_redirect.test/instagram'
+            'auth_callback_route'  => 'instagram'
         ], $mockClient);
 
 

@@ -5,6 +5,7 @@ namespace Dymantic\InstagramFeed\Tests\Client;
 use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\MockableDummyHttpClient;
 use Dymantic\InstagramFeed\Tests\TestCase;
+use GuzzleHttp\RequestOptions;
 
 class SimpleClientTest extends TestCase
 {
@@ -19,12 +20,10 @@ class SimpleClientTest extends TestCase
         $mockHttp = $this->createMock(MockableDummyHttpClient::class);
         $mockHttp->expects($this->once())
             ->method('post')
-            ->with($this->equalTo('https://test.test'), $this->equalTo([
-                'body' => [
+            ->with($this->equalTo('https://test.test'), $this->equalTo([RequestOptions::FORM_PARAMS => [
                     'foo' => 'bar',
                     'baz' => 'test'
-                ]
-            ]))
+            ]]))
             ->willReturn($this->mockResponse());
 
         app()->bind(SimpleClient::class, function() use ($mockHttp) {
