@@ -4,6 +4,8 @@
 namespace Dymantic\InstagramFeed;
 
 
+use Dymantic\InstagramFeed\Exceptions\BadTokenException;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\RequestOptions;
 
 class SimpleClient
@@ -14,6 +16,13 @@ class SimpleClient
     public function __construct($client)
     {
         $this->client = $client;
+    }
+
+    public function get($url)
+    {
+        $response = $this->client->get($url);
+
+        return \GuzzleHttp\json_decode($response->getBody(), true);
     }
 
     public function post($url, $options)
