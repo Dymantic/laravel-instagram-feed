@@ -59,13 +59,13 @@ return [
 
 ### Profiles
 
-All Instagram api calls now need auth via OAuth, and so you need an entity to associate the resulting access token with. This package provides a `Dymantic\InstagramFeed\Profile` model to fit that role. An instance of the model required a username, so you have some way to refer to it, and it is through this model that you will access the Instagram feed belomging to the access token granted to the profile. You may have several profiles, which means you may have more than one Instagram feed. How you use the Profiles is up to you (e.i. associating with users, or just having one profile, etc).
+All Instagram api calls now need auth via OAuth, and so you need an entity to associate the resulting access token with. This package provides a `Dymantic\InstagramFeed\Profile` model to fit that role. An instance of the model requires a username, so you have some way to refer to it, and it is through this model that you will access the Instagram feed belomging to the access token granted to the profile. You may have several profiles, which means you may have more than one Instagram feed. How you use the Profiles is up to you (e.i. associating with users, or just having one profile, etc).
 
 Having just a single profile for a project is a fairly common use case, so this package includes an artisan command to quickly create a profile, so that you don't need to build out the necessary UI for your users to do so. Running `php artisan instagram-feed:profile {username}` will create a profile with that username, that you may then use as desired.
 
 ### Getting Authorized
 
-Once you have a profile, you may call the `getInstagramAuthUrl()` method on it to get a link to present to the user that will give authentication. When the user visits that url then can grant access to your app (or not). If everything goes smoothly, the user will be redirected back to the route you configured. If access is not granted, you will be redirected to the alternate route you configured. If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user (because you are in Sandbox mode), Instagram won't redirect at all, and your user will see an error page from Instagram.
+Once you have a profile, you may call the `getInstagramAuthUrl()` method on it to get a link to present to the user that will give authentication. When the user visits that url they can then grant access to your app (or not). If everything goes smoothly, the user will be redirected back to the route you configured. If access is not granted, you will be redirected to the alternate route you configured. If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user (because you are in Sandbox mode), Instagram won't redirect at all, and your user will see an error page from Instagram.
 
 ### Getting the feed
 
