@@ -9,6 +9,7 @@ use Dymantic\InstagramFeed\Profile;
 use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 
@@ -182,7 +183,7 @@ class ProfilesTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function a_profile_can_return_its_access_token_string()
     {
@@ -210,7 +211,7 @@ class ProfilesTest extends TestCase
                    ->with($this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profile->fresh()->accessToken()}"))
                    ->willReturn($this->exampleMediaResponse());
 
-        $this->app->bind(SimpleClient::class, function() use ($mockCLient) {
+        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
             return $mockCLient;
         });
 
@@ -222,6 +223,33 @@ class ProfilesTest extends TestCase
     /**
      *@test
      */
+    public function the_feed_is_returned_as_a_collection()
+    {
+        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
+        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
+        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
+
+        $profile = Profile::create(['username' => 'test_user']);
+        AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
+
+        $mockCLient = $this->createMock(SimpleClient::class);
+        $mockCLient->expects($this->once())
+                   ->method('get')
+                   ->with($this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profile->fresh()->accessToken()}"))
+                   ->willReturn($this->exampleMediaResponse());
+
+        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
+            return $mockCLient;
+        });
+
+        $feed = $profile->feed();
+
+        $this->assertInstanceOf(Collection::class, $feed);
+    }
+
+    /**
+     * @test
+     */
     public function the_profile_has_a_cache_key()
     {
         $profile = Profile::create(['username' => 'test_user']);
@@ -230,7 +258,7 @@ class ProfilesTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function the_profile_feed_is_cached()
     {
@@ -247,7 +275,7 @@ class ProfilesTest extends TestCase
                    ->with($this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profile->fresh()->accessToken()}"))
                    ->willReturn($this->exampleMediaResponse());
 
-        $this->app->bind(SimpleClient::class, function() use ($mockCLient) {
+        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
             return $mockCLient;
         });
 
@@ -255,15 +283,15 @@ class ProfilesTest extends TestCase
         $this->assertCount(2, $feed);
 
         $this->assertTrue(cache()->has($profile->cacheKey()));
-        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
 
         $second_call_to_feed = $profile->feed();
 
-        $this->assertEquals($feed, $second_call_to_feed);
+        $this->assertEquals($feed->all(), $second_call_to_feed->all());
     }
 
     /**
-     *@test
+     * @test
      */
     public function the_feed_for_a_profile_can_be_refreshed()
     {
@@ -286,17 +314,17 @@ class ProfilesTest extends TestCase
                    ->with($this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profile->fresh()->accessToken()}"))
                    ->willReturn($this->exampleMediaResponse());
 
-        $this->app->bind(SimpleClient::class, function() use ($mockClient) {
+        $this->app->bind(SimpleClient::class, function () use ($mockClient) {
             return $mockClient;
         });
 
         $feed = $profile->refreshFeed();
         $this->assertCount(2, $feed);
-        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
     }
 
     /**
-     *@test
+     * @test
      */
     public function a_profile_can_clear_its_token()
     {
@@ -312,9 +340,9 @@ class ProfilesTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
-    public function the_feed_method_will_not_throw_exceptions_but_only_return_empty_array()
+    public function the_feed_method_will_not_throw_exceptions_but_only_return_empty_collection()
     {
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
@@ -333,11 +361,11 @@ class ProfilesTest extends TestCase
         });
 
         $feed = $profile->feed();
-        $this->assertEquals([], $feed);
+        $this->assertEquals([], $feed->all());
     }
 
     /**
-     *@test
+     * @test
      */
     public function the_refresh_feed_method_will_not_overwrite_cache_with_failed_response()
     {
@@ -362,9 +390,33 @@ class ProfilesTest extends TestCase
         try {
             $profile->refreshFeed();
             $this->fail('Expected exception not thrown');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->assertEquals(['test' => 'test value'], cache()->get($profile->cacheKey()));
         }
 
+    }
+
+    /**
+     * @test
+     */
+    public function a_profile_can_present_its_view_data()
+    {
+        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
+        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
+        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
+
+        $profile = Profile::create(['username' => 'test user']);
+        AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
+
+        $expected = [
+            'name'     => 'test user',
+            'username' => 'TEST_USERNAME',
+            'fullname' => 'TEST FULL NAME',
+            'avatar'   => 'TEST AVATAR',
+            'has_auth' => true,
+            'get_auth_url' => $profile->getInstagramAuthUrl()
+        ];
+
+        $this->assertEquals($expected, $profile->viewData());
     }
 }

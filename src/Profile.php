@@ -43,7 +43,7 @@ class Profile extends Model
 
         try {
             $token_details = $instagram->requestTokenForProfile($this, $request);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new AccessTokenRequestException($e->getMessage());
         }
 
@@ -54,7 +54,7 @@ class Profile extends Model
     {
         $this->tokens->each->delete();
 
-       return AccessToken::createFromResponseArray($this, $token_details);
+        return AccessToken::createFromResponseArray($this, $token_details);
     }
 
     public function hasInstagramAccess()
@@ -65,17 +65,19 @@ class Profile extends Model
     public function accessToken()
     {
         $token = $this->tokens()->first();
+
         return $token ? $token->access_code : null;
     }
 
-    public function clearToken() {
+    public function clearToken()
+    {
         $this->tokens->each->delete();
     }
 
     public function feed()
     {
-        if(Cache::has($this->cacheKey())) {
-            return Cache::get($this->cacheKey());
+        if (Cache::has($this->cacheKey())) {
+            return collect(Cache::get($this->cacheKey()));
         }
 
         $instagram = app()->make(Instagram::class);
@@ -83,9 +85,10 @@ class Profile extends Model
         try {
             $feed = $instagram->fetchMedia($this->accessToken());
             Cache::forever($this->cacheKey(), $feed);
-            return $feed;
-        } catch(\Exception $e) {
-            return [];
+
+            return collect($feed);
+        } catch (\Exception $e) {
+            return collect([]);
         }
     }
 
@@ -98,5 +101,18 @@ class Profile extends Model
         Cache::forever($this->cacheKey(), $new_feed);
 
         return $this->feed();
+    }
+
+    public function viewData()
+    {
+        $token = $this->tokens->first();
+        return [
+            'name'         => $this->username,
+            'username'     => $token->username ?? '',
+            'fullname'     => $token->user_fullname ?? '',
+            'avatar'       => $token->user_profile_picture ?? '',
+            'has_auth'     => $this->hasInstagramAccess(),
+            'get_auth_url' => $this->getInstagramAuthUrl()
+        ];
     }
 }
