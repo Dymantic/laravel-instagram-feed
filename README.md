@@ -1,5 +1,7 @@
 # Laravel Instagram Feed
 
+[![Build Status](https://travis-ci.org/Dymantic/laravel-instagram-feed.svg?branch=master)](https://travis-ci.org/Dymantic/laravel-instagram-feed)
+
 ## Easily include your Instagram feed(s) in your project.
 
 The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project. The package is made so that ideally the view is almost always just using cached data, and the feed itself will be updated at a schedule of your choosing, using Laravel's great scheduling features. The feed is also designed to be resilient, so that you can safely call it from your controllers without having to worry about errors breaking the page.
