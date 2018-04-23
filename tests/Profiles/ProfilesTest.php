@@ -49,11 +49,10 @@ class ProfilesTest extends TestCase
     {
         $client_id = 'TEST_CLIENT_ID';
         $redirect_uri_base = 'instagram_test';
+        $profile = Profile::create(['username' => 'test_user']);
 
         $this->app['config']->set('instagram-feed.client_id', $client_id);
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
         $this->app['config']->set('instagram-feed.auth_callback_route', $redirect_uri_base);
-        $profile = Profile::create(['username' => 'test_user']);
 
 
         $app_url = rtrim(config('app.url'), '/');
@@ -69,10 +68,6 @@ class ProfilesTest extends TestCase
      */
     public function a_profile_can_request_an_access_token_from_a_successful_auth_redirect()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
 
         $mockClient = $this->createMock(SimpleClient::class);
@@ -82,7 +77,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/TEST_AUTH_CALLBACK_ROUTE?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willReturn($this->validTokenDetails());
@@ -108,10 +103,6 @@ class ProfilesTest extends TestCase
      */
     public function requesting_a_token_from_a_denied_auth_redirect_throws_an_exception()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'https://test_instagram.test/instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
 
         $mockClient = $this->createMock(SimpleClient::class);
@@ -134,13 +125,9 @@ class ProfilesTest extends TestCase
     /**
      * @test
      */
-    public function any_exception_raised_by_requesting_access_token_will_be_caught_and_thrown_as_access_token_exception(
+    public function exceptions_raised_by_requesting_access_token_will_be_caught_and_thrown_as_access_token_exception(
     )
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
 
         $mockClient = $this->createMock(SimpleClient::class);
@@ -150,7 +137,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/TEST_AUTH_CALLBACK_ROUTE?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());
@@ -198,10 +185,6 @@ class ProfilesTest extends TestCase
      */
     public function a_profile_with_an_access_token_can_fetch_its_recent_media()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
         AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
 
@@ -225,10 +208,6 @@ class ProfilesTest extends TestCase
      */
     public function the_feed_is_returned_as_a_collection()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
         AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
 
@@ -262,10 +241,6 @@ class ProfilesTest extends TestCase
      */
     public function the_profile_feed_is_cached()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
         AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
 
@@ -304,10 +279,6 @@ class ProfilesTest extends TestCase
 
         cache()->put($profile->cacheKey(), $old_feed, 1000);
 
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
                    ->method('get')
@@ -344,10 +315,6 @@ class ProfilesTest extends TestCase
      */
     public function the_feed_method_will_not_throw_exceptions_but_only_return_empty_collection()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test_user']);
 
         $mockClient = $this->createMock(SimpleClient::class);
@@ -370,9 +337,6 @@ class ProfilesTest extends TestCase
     public function the_refresh_feed_method_will_not_overwrite_cache_with_failed_response()
     {
         $this->disableExceptionHandling();
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
 
         $profile = Profile::create(['username' => 'test_user']);
         cache()->forever($profile->cacheKey(), ['test' => 'test value']);
@@ -401,10 +365,6 @@ class ProfilesTest extends TestCase
      */
     public function a_profile_can_present_its_view_data()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $profile = Profile::create(['username' => 'test user']);
         AccessToken::createFromResponseArray($profile, $this->validTokenDetails());
 

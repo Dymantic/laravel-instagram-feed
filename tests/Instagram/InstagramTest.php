@@ -116,10 +116,6 @@ class InstagramTest extends TestCase
      */
     public function it_can_detect_bad_token_requests_and_throw_a_useful_exception()
     {
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-
         $mockHttp = $this->createMock(MockableDummyHttpClient::class);
         $mockHttp->expects($this->once())
                  ->method('get')

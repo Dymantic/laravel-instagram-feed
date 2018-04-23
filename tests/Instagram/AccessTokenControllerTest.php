@@ -30,10 +30,8 @@ class AccessTokenControllerTest extends TestCase
     public function it_handles_a_redirect_with_a_valid_profile_id_and_code()
     {
         $this->disableExceptionHandling();
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'https://test_instagram.test/instagram');
         $this->app['config']->set('instagram-feed.success_redirect_to', 'success');
+
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
             ->method('post')
@@ -61,9 +59,6 @@ class AccessTokenControllerTest extends TestCase
     public function it_redirects_if_it_cannot_resolve_the_profile_from_the_redirect()
     {
         $this->disableExceptionHandling();
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
         $this->app['config']->set('instagram-feed.failure_redirect_to', 'failed_auth');
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->never())
@@ -88,9 +83,6 @@ class AccessTokenControllerTest extends TestCase
     public function it_redirects_if_it_fails_to_get_request_token()
     {
         $this->disableExceptionHandling();
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
         $this->app['config']->set('instagram-feed.failure_redirect_to', 'failed_auth');
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->never())
@@ -116,9 +108,6 @@ class AccessTokenControllerTest extends TestCase
     public function it_redirects_if_it_fails_to_get_an_access_token()
     {
         $this->disableExceptionHandling();
-        $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
-        $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
         $this->app['config']->set('instagram-feed.failure_redirect_to', 'failed_auth');
 
         $profile = Profile::create(['username' => 'test_user']);
@@ -130,7 +119,7 @@ class AccessTokenControllerTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/TEST_AUTH_CALLBACK_ROUTE?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());
