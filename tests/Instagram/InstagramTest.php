@@ -114,6 +114,40 @@ class InstagramTest extends TestCase
     /**
      *@test
      */
+    public function it_ignores_video_posts_if_required_in_config()
+    {
+        config(['instagram-feed.ignore_video' => true]);
+        $mockClient = $this->createMock(SimpleClient::class);
+        $mockClient->expects($this->once())
+                   ->method('get')
+                   ->with($this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token=TEST_ACCESS_CODE"))
+                   ->willReturn($this->exampleMediaResponse());
+
+        $instagram = new Instagram([
+            'client_id'     => 'TEST_CLIENT_ID',
+            'client_secret' => 'TEST_CLIENT_SECRET',
+            'auth_callback_route'  => 'instagram'
+        ], $mockClient);
+
+        $feed = $instagram->fetchMedia('TEST_ACCESS_CODE');
+
+        $expected = [
+            [
+                'low' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_6.jpg',
+                'thumb' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_5.jpg',
+                'standard' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_7.jpg',
+                'likes' => 15,
+                'caption' => 'Inside le truc #foodtruck'
+            ],
+        ];
+
+        $this->assertCount(1, $feed);
+        $this->assertEquals($expected, $feed);
+    }
+
+    /**
+     *@test
+     */
     public function it_can_detect_bad_token_requests_and_throw_a_useful_exception()
     {
         $mockHttp = $this->createMock(MockableDummyHttpClient::class);

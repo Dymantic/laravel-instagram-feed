@@ -68,17 +68,21 @@ class Instagram
             }
         }
 
-        return collect($response['data'])->map(function ($media) {
-            return [
-                'low'      => $media['images']['low_resolution']['url'] ?? '',
-                'thumb'    => $media['images']['thumbnail']['url'] ?? '',
-                'standard' => $media['images']['standard_resolution']['url'] ?? '',
-                'likes'    => $media['likes']['count'] ?? '',
-                'caption'  => $media['caption']['text'] ?? ''
-            ];
-        })->reject(function ($media) {
-            return empty($media['thumb']);
-        })->all();
+        return collect($response['data'])
+            ->reject(function ($media) {
+                return config('instagram-feed.ignore_video', false) && $media['type'] === 'video';
+            })
+            ->map(function ($media) {
+                return [
+                    'low'      => $media['images']['low_resolution']['url'] ?? '',
+                    'thumb'    => $media['images']['thumbnail']['url'] ?? '',
+                    'standard' => $media['images']['standard_resolution']['url'] ?? '',
+                    'likes'    => $media['likes']['count'] ?? '',
+                    'caption'  => $media['caption']['text'] ?? ''
+                ];
+            })->reject(function ($media) {
+                return empty($media['thumb']);
+            })->all();
     }
 
 
