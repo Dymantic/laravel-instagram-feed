@@ -6,6 +6,10 @@
 
 The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project. The package is made so that ideally the view is almost always just using cached data, and the feed itself will be updated at a schedule of your choosing, using Laravel's great scheduling features. The feed is also designed to be resilient, so that you can safely call it from your controllers without having to worry about errors breaking the page.
 
+### Warning:
+
+Version 1.0 has been tagged, but I still need to rewrite this readme. If you want to go ahead and update anyway, just know that each instagram item/post will no longer have the caption field. Otherwise you should be fine. The new changes are mainly to do with how to handle video and carousel media, and I'll update this asap to make it clear how that gets used.
+
 ### Installation
 
 ```
