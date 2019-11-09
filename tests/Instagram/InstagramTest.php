@@ -92,18 +92,18 @@ class InstagramTest extends TestCase
 
         $expected = [
             [
+                'type' => 'image',
                 'low' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_6.jpg',
                 'thumb' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_5.jpg',
                 'standard' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_7.jpg',
                 'likes' => 15,
-                'caption' => 'Inside le truc #foodtruck'
             ],
             [
-                'low' => 'http://distilleryimage2.ak.instagram.com/11f75f1cd9cc11e2a0fd22000aa8039a_6.jpg',
-                'thumb' => 'http://distilleryimage2.ak.instagram.com/11f75f1cd9cc11e2a0fd22000aa8039a_5.jpg',
-                'standard' => 'http://distilleryimage2.ak.instagram.com/11f75f1cd9cc11e2a0fd22000aa8039a_7.jpg',
+                'type' => 'video',
+                'low' => 'http://distilleryvesper9-13.ak.instagram.com/090d06dad9cd11e2aa0912313817975d_102.mp4',
+                'thumb' => 'http://distilleryvesper9-13.ak.instagram.com/090d06dad9cd11e2aa0912313817975d_102.mp4',
+                'standard' => 'http://distilleryvesper9-13.ak.instagram.com/090d06dad9cd11e2aa0912313817975d_101.mp4',
                 'likes' => 1,
-                'caption' => ''
             ]
         ];
 
@@ -133,11 +133,11 @@ class InstagramTest extends TestCase
 
         $expected = [
             [
+                'type' => 'image',
                 'low' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_6.jpg',
                 'thumb' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_5.jpg',
                 'standard' => 'http://distillery.s3.amazonaws.com/media/2011/02/02/6ea7baea55774c5e81e7e3e1f6e791a7_7.jpg',
                 'likes' => 15,
-                'caption' => 'Inside le truc #foodtruck'
             ],
         ];
 

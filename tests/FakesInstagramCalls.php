@@ -127,6 +127,11 @@ trait FakesInstagramCalls
                             "width"  => 480,
                             "height" => 480
                         ],
+                        "low_bandwidth"      => [
+                            "url"    => "http://distilleryvesper9-13.ak.instagram.com/090d06dad9cd11e2aa0912313817975d_102.mp4",
+                            "width"  => 480,
+                            "height" => 480
+                        ],
                         "standard_resolution" => [
                             "url"    => "http://distilleryvesper9-13.ak.instagram.com/090d06dad9cd11e2aa0912313817975d_101.mp4",
                             "width"  => 640,
