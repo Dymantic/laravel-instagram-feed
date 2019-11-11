@@ -33,8 +33,8 @@ class RefreshProfileFeedsTest extends TestCase
         $mockClient->expects($this->exactly(2))
                    ->method('get')
                    ->withConsecutive(
-                       $this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileA->fresh()->accessToken()}"),
-                       $this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileB->fresh()->accessToken()}"))
+                       [$this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileA->fresh()->accessToken()}")],
+                       [$this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileB->fresh()->accessToken()}")])
                    ->willReturn($this->exampleMediaResponse());
 
         $this->app->bind(SimpleClient::class, function() use ($mockClient) {
