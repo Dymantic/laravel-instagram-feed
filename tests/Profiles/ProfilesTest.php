@@ -63,9 +63,9 @@ class ProfilesTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
         $app_url = rtrim(config('app.url'), '/');
-        $full_redirect_uri = "{$app_url}/instagram?profile={$profile->id}";
+        $full_redirect_uri = "{$app_url}/instagram";
 
-        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code";
+        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
 
         $this->assertEquals($expected, $profile->getInstagramAuthUrl());
     }
@@ -84,7 +84,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willReturn($this->validTokenDetails());
@@ -193,7 +193,7 @@ class ProfilesTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());

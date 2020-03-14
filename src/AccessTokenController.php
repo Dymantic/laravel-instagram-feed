@@ -8,7 +8,7 @@ class AccessTokenController
 {
     public function handleRedirect()
     {
-        $profile = Profile::find((int)request('profile'));
+        $profile = Profile::find((int)request('state'));
 
         if(! $profile) {
             return redirect(config('instagram-feed.failure_redirect_to'));

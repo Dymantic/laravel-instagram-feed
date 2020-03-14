@@ -39,9 +39,9 @@ class InstagramTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
 
-        $full_redirect_uri = 'http://test.test/instagram?profile=' . $profile->id;
+        $full_redirect_uri = 'http://test.test/instagram';
 
-        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code";
+        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
 
         $instagram = app(Instagram::class);
 
@@ -63,7 +63,7 @@ class InstagramTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willReturn($this->validTokenDetails());

@@ -36,7 +36,7 @@ class Instagram
         $client_id = $this->client_id;
         $redirect = $this->redirectUriForProfile($profile->id);
 
-        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code";
+        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code&state={$profile->id}";
     }
 
     public function requestTokenForProfile($profile, $auth_request)
@@ -54,7 +54,7 @@ class Instagram
     {
         $base = rtrim(config('app.url'), '/');
 
-        return "{$base}/{$this->redirect_uri}?profile={$profile_id}";
+        return "{$base}/{$this->redirect_uri}";
     }
 
     public function fetchUserDetails($access_token)

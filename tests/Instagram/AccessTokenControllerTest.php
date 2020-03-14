@@ -54,7 +54,7 @@ class AccessTokenControllerTest extends TestCase
 
         $profile = Profile::create(['username' => 'test_user']);
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?profile={$profile->id}&code=TEST_REQUEST_TOKEN";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_TOKEN&state={$profile->id}";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect('success');
@@ -104,7 +104,7 @@ class AccessTokenControllerTest extends TestCase
 
         $profile = Profile::create(['username' => 'test_user']);
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?profile={$profile->id}&error=access_denied";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?&error=access_denied";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect(config('instagram-feed.failure_redirect_to'));
@@ -129,7 +129,7 @@ class AccessTokenControllerTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());
@@ -139,7 +139,7 @@ class AccessTokenControllerTest extends TestCase
         });
 
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?profile={$profile->id}&code=TEST_REQUEST_CODE";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_CODE&state={$profile->id}";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect(config('instagram-feed.failure_redirect_to'));
