@@ -79,8 +79,6 @@ trait FakesInstagramCalls
         return [
             'id' => 'FAKE_USER_ID',
             'username' => 'instagram_test_username',
-            'name' => 'test user real name',
-            'profile_picture_url' => 'https://test.test/test_pic.jpg',
         ];
     }
 

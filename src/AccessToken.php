@@ -19,8 +19,8 @@ class AccessToken extends Model
             'access_code' => $token_details['access_token'],
             'user_id' => $token_details['id'],
             'username' => $token_details['username'],
-            'user_fullname' => $token_details['name'],
-            'user_profile_picture' => $token_details['profile_picture_url'],
+            'user_fullname' => 'not available',
+            'user_profile_picture' => 'not available',
         ]);
     }
 }

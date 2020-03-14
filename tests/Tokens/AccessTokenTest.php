@@ -21,7 +21,7 @@ class AccessTokenTest extends TestCase
         $this->assertEquals('VALID_LONG_LIVED_TOKEN', $token->access_code);
         $this->assertEquals('FAKE_USER_ID', $token->user_id);
         $this->assertEquals('instagram_test_username', $token->username);
-        $this->assertEquals('test user real name', $token->user_fullname);
-        $this->assertEquals('https://test.test/test_pic.jpg', $token->user_profile_picture);
+        $this->assertEquals('not available', $token->user_fullname);
+        $this->assertEquals('not available', $token->user_profile_picture);
     }
 }

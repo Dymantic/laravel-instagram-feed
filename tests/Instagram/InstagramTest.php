@@ -87,7 +87,7 @@ class InstagramTest extends TestCase
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
                    ->method('get')
-                   ->with($this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username,name,profile_picture_url&access_token=VALID_ACCESS_TOKEN"))
+                   ->with($this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username&access_token=VALID_ACCESS_TOKEN"))
                    ->willReturn($this->validUserDetails());
 
         app()->instance(SimpleClient::class, $mockClient);

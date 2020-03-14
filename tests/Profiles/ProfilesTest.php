@@ -91,7 +91,7 @@ class ProfilesTest extends TestCase
 
         $mockClient->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username,name,profile_picture_url&access_token=VALID_ACCESS_TOKEN"))
+            ->with($this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username&access_token=VALID_ACCESS_TOKEN"))
             ->willReturn($this->validUserDetails());
 
         $mockClient->expects($this->at(2))
@@ -111,8 +111,6 @@ class ProfilesTest extends TestCase
             'access_code'          => 'VALID_LONG_LIVED_TOKEN',
             'username'             => 'instagram_test_username',
             'user_id'              => 'FAKE_USER_ID',
-            'user_fullname'        => 'test user real name',
-            'user_profile_picture' => 'https://test.test/test_pic.jpg',
         ]);
     }
 
@@ -430,8 +428,8 @@ class ProfilesTest extends TestCase
         $expected = [
             'name'     => 'test user',
             'username' => 'instagram_test_username',
-            'fullname' => 'test user real name',
-            'avatar'   => 'https://test.test/test_pic.jpg',
+            'fullname' => 'not available',
+            'avatar'   => 'not available',
             'has_auth' => true,
             'get_auth_url' => $profile->getInstagramAuthUrl()
         ];
