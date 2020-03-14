@@ -33,10 +33,20 @@ class AccessTokenControllerTest extends TestCase
         $this->app['config']->set('instagram-feed.success_redirect_to', 'success');
 
         $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
+        $mockClient->expects($this->at(0))
             ->method('post')
             ->with($this->anything(), $this->anything())
             ->willReturn($this->validTokenDetails());
+
+        $mockClient->expects($this->at(1))
+                   ->method('get')
+                   ->with($this->anything())
+                   ->willReturn($this->validUserDetails());
+
+        $mockClient->expects($this->at(2))
+                   ->method('get')
+                   ->with($this->anything())
+                   ->willReturn($this->validLongLivedToken());
 
         $this->app->bind(SimpleClient::class, function() use ($mockClient) {
             return $mockClient;
@@ -119,7 +129,7 @@ class AccessTokenControllerTest extends TestCase
                        'client_id'     => 'TEST_CLIENT_ID',
                        'client_secret' => 'TEST_CLIENT_SECRET',
                        'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/TEST_AUTH_CALLBACK_ROUTE?profile={$profile->id}",
+                       'redirect_uri'  => "http://test.test/instagram?profile={$profile->id}",
                        'code'          => 'TEST_REQUEST_CODE'
                    ]))
                    ->willThrowException(new \Exception());

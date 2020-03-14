@@ -43,11 +43,21 @@ class Profile extends Model
 
         try {
             $token_details = $instagram->requestTokenForProfile($this, $request);
+            $user_details = $instagram->fetchUserDetails($token_details);
+            $token = $instagram->exchangeToken($token_details);
         } catch (\Exception $e) {
             throw new AccessTokenRequestException($e->getMessage());
         }
 
-        return $this->setToken($token_details);
+        return $this->setToken(array_merge(['access_token' => $token['access_token']], $user_details));
+    }
+
+    public function refreshToken()
+    {
+        $instagram = app()->make(Instagram::class);
+        $token = $this->accessToken();
+        $new_token = $instagram->refreshToken($token);
+        $this->latestToken()->update(['access_code' => $new_token['access_token']]);
     }
 
     protected function setToken($token_details)
@@ -59,14 +69,17 @@ class Profile extends Model
 
     public function hasInstagramAccess()
     {
-        return $this->tokens()->count() > 0;
+        return !! $this->latestToken();
+    }
+
+    private function latestToken()
+    {
+        return $this->tokens()->latest()->first();
     }
 
     public function accessToken()
     {
-        $token = $this->tokens()->first();
-
-        return $token ? $token->access_code : null;
+        return $this->latestToken()->access_code ?? null;
     }
 
     public function clearToken()
@@ -76,6 +89,9 @@ class Profile extends Model
 
     public function feed()
     {
+        if(!$this->latestToken()) {
+            return collect([]);
+        }
         if (Cache::has($this->cacheKey())) {
             return collect(Cache::get($this->cacheKey()));
         }
@@ -83,7 +99,7 @@ class Profile extends Model
         $instagram = app()->make(Instagram::class);
 
         try {
-            $feed = $instagram->fetchMedia($this->accessToken());
+            $feed = $instagram->fetchMedia($this->latestToken());
             Cache::forever($this->cacheKey(), $feed);
 
             return collect($feed);
@@ -95,7 +111,7 @@ class Profile extends Model
     public function refreshFeed()
     {
         $instagram = app()->make(Instagram::class);
-        $new_feed = $instagram->fetchMedia($this->accessToken());
+        $new_feed = $instagram->fetchMedia($this->latestToken());
 
         Cache::forget($this->cacheKey());
         Cache::forever($this->cacheKey(), $new_feed);

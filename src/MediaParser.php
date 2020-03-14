@@ -8,16 +8,16 @@ class MediaParser
 {
     public static function parseItem($media, $ignore_video = false)
     {
-        $type = $media['type'];
+        $type = $media['media_type'];
 
         switch ($type) {
-            case 'image':
+            case 'IMAGE':
                 return static::parseAsImage($media);
                 break;
-            case 'video':
+            case 'VIDEO':
                 return static::parseAsVideo($media, $ignore_video);
                 break;
-            case 'carousel':
+            case 'CAROUSEL_ALBUM':
                 return static::parseAsCarousel($media, $ignore_video);
                 break;
         }
@@ -25,10 +25,11 @@ class MediaParser
 
     private static function parseAsImage($media)
     {
-        $parsed = static::extractImage($media['images']);
-        $parsed['likes'] = $media['likes']['count'] ?? null;
+        return [
+            'type' => 'image',
+            'url'  => $media['media_url'],
+        ];
 
-        return $parsed;
     }
 
     private static function parseAsVideo($media, $ignore_video)
@@ -37,31 +38,23 @@ class MediaParser
             return;
         }
 
-        $parsed = static::extractVideo($media['videos']);
-        $parsed['likes'] = $media['likes']['count'] ?? null;
-
-        return $parsed;
+        return [
+            'type' => 'video',
+            'url'  => $media['media_url'],
+        ];
     }
 
     private static function parseAsCarousel($media, $ignore_video)
     {
-        $first_item = static::firstCarouselItem($media, $ignore_video);
+        $use = collect($media['children']['data'])
+            ->first(function($child) use ($ignore_video) {
+                return $child['media_type'] === 'IMAGE' || (!$ignore_video);
+            });
 
-        if (!$first_item) {
-            return;
-        }
-
-        if ($first_item['videos'] ?? false) {
-            $parsed = static::extractVideo($first_item['videos']);
-        }
-
-        if ($first_item['images'] ?? false) {
-            $parsed = static::extractImage($first_item['images']);
-        }
-
-        $parsed['likes'] = $media['likes']['count'] ?? null;
-
-        return $parsed;
+        return [
+            'type' => strtolower($use['media_type']),
+            'url'  => $use['media_url'],
+        ];
     }
 
     private static function firstCarouselItem($media, $ignore_video)

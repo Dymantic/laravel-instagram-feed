@@ -10,7 +10,12 @@ use GuzzleHttp\Exception\ClientException;
 class Instagram
 {
     const REQUEST_ACCESS_TOKEN_URL = "https://api.instagram.com/oauth/access_token";
-    const REQUEST_MEDIA_URL = "https://api.instagram.com/v1/users/self/media/recent/?access_token=";
+    const GRAPH_USER_INFO_FORMAT = "https://graph.instagram.com/%s?fields=id,username,name,profile_picture_url&access_token=%s";
+    const EXCHANGE_TOKEN_FORMAT = "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=%s&access_token=%s";
+    const REFRESH_TOKEN_FORMAT = "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%s";
+    const MEDIA_URL_FORMAT = "https://graph.instagram.com/%s/media?fields=%s&limit=%s&access_token=%s";
+    const MEDIA_FIELDS = "caption,id,media_type,media_url,thumbnail_url,children.media_type,children.media_url";
+
 
     private $client_id;
     private $client_secret;
@@ -31,7 +36,7 @@ class Instagram
         $client_id = $this->client_id;
         $redirect = $this->redirectUriForProfile($profile->id);
 
-        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&response_type=code";
+        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code";
     }
 
     public function requestTokenForProfile($profile, $auth_request)
@@ -52,9 +57,29 @@ class Instagram
         return "{$base}/{$this->redirect_uri}?profile={$profile_id}";
     }
 
-    public function fetchMedia($access_code)
+    public function fetchUserDetails($access_token)
     {
-        $url = static::REQUEST_MEDIA_URL . $access_code;
+        $url = sprintf(self::GRAPH_USER_INFO_FORMAT, $access_token['user_id'], $access_token['access_token']);
+        return $this->http->get($url);
+    }
+
+    public function exchangeToken($short_token)
+    {
+        $url = sprintf(self::EXCHANGE_TOKEN_FORMAT, $this->client_secret, $short_token['access_token']);
+
+        return $this->http->get($url);
+    }
+
+    public function refreshToken($token)
+    {
+        $url = sprintf(self::REFRESH_TOKEN_FORMAT, $token);
+        return $this->http->get($url);
+    }
+
+    public function fetchMedia(AccessToken $token)
+    {
+        $limit = 20;
+        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $limit, $token->access_code);
 
         try {
             $response = $this->http->get($url);
@@ -74,9 +99,6 @@ class Instagram
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })
-            ->reject(function ($media) {
-                return empty($media['thumb']);
             })->all();
     }
 

@@ -67,7 +67,7 @@ abstract class TestCase extends Orchestra
 
         $app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
-        $app['config']->set('instagram-feed.auth_callback_route', 'TEST_AUTH_CALLBACK_ROUTE');
+        $app['config']->set('instagram-feed.auth_callback_route', 'instagram');
     }
 
     /**

@@ -17,10 +17,10 @@ class AccessToken extends Model
         return static::create([
             'profile_id' => $profile->id,
             'access_code' => $token_details['access_token'],
-            'user_id' => $token_details['user']['id'],
-            'username' => $token_details['user']['username'],
-            'user_fullname' => $token_details['user']['full_name'],
-            'user_profile_picture' => $token_details['user']['profile_picture']
+            'user_id' => $token_details['id'],
+            'username' => $token_details['username'],
+            'user_fullname' => $token_details['name'],
+            'user_profile_picture' => $token_details['profile_picture_url'],
         ]);
     }
 }

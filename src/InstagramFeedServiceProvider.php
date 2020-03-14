@@ -6,6 +6,7 @@ namespace Dymantic\InstagramFeed;
 
 use Dymantic\InstagramFeed\Commands\CreateBasicProfile;
 use Dymantic\InstagramFeed\Commands\RefreshAuthorizedFeeds;
+use Dymantic\InstagramFeed\Commands\RefreshTokens;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,7 +19,8 @@ class InstagramFeedServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CreateBasicProfile::class,
-                RefreshAuthorizedFeeds::class
+                RefreshAuthorizedFeeds::class,
+                RefreshTokens::class,
             ]);
         }
 

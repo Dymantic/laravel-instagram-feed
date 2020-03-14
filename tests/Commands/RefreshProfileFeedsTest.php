@@ -4,6 +4,7 @@ namespace Dymantic\InstagramFeed\Tests\Commands;
 
 use Dymantic\InstagramFeed\AccessToken;
 use Dymantic\InstagramFeed\Exceptions\BadTokenException;
+use Dymantic\InstagramFeed\Instagram;
 use Dymantic\InstagramFeed\Mail\FeedRefreshFailed;
 use Dymantic\InstagramFeed\Profile;
 use Dymantic\InstagramFeed\SimpleClient;
@@ -21,9 +22,9 @@ class RefreshProfileFeedsTest extends TestCase
     public function calling_the_command_will_refresh_the_feeds()
     {
         $profileA = Profile::create(['username' => 'test user']);
-        AccessToken::createFromResponseArray($profileA, $this->validTokenDetails());
+        $tokenA = AccessToken::createFromResponseArray($profileA, $this->validUserWithToken());
         $profileB = Profile::create(['username' => 'test user two']);
-        AccessToken::createFromResponseArray($profileB, $this->validTokenDetails());
+        $tokenB = AccessToken::createFromResponseArray($profileB, $this->validUserWithToken());
 
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
@@ -33,8 +34,8 @@ class RefreshProfileFeedsTest extends TestCase
         $mockClient->expects($this->exactly(2))
                    ->method('get')
                    ->withConsecutive(
-                       [$this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileA->fresh()->accessToken()}")],
-                       [$this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$profileB->fresh()->accessToken()}")])
+                       [$this->equalTo($this->makeMediaUrl($tokenA))],
+                       [$this->equalTo($this->makeMediaUrl($tokenB))])
                    ->willReturn($this->exampleMediaResponse());
 
         $this->app->bind(SimpleClient::class, function() use ($mockClient) {
@@ -54,7 +55,7 @@ class RefreshProfileFeedsTest extends TestCase
     public function non_authorized_profiles_are_not_refreshed()
     {
         $authorized_profile = Profile::create(['username' => 'test user']);
-        AccessToken::createFromResponseArray($authorized_profile, $this->validTokenDetails());
+        $token = AccessToken::createFromResponseArray($authorized_profile, $this->validUserWithToken());
         $unauthorized_profile = Profile::create(['username' => 'test user two']);
 
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
@@ -65,7 +66,7 @@ class RefreshProfileFeedsTest extends TestCase
         $mockClient->expects($this->once())
                    ->method('get')
                    ->with(
-                       $this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$authorized_profile->fresh()->accessToken()}")
+                       $this->equalTo($this->makeMediaUrl($token))
                    )
                    ->willReturn($this->exampleMediaResponse());
 
@@ -87,7 +88,7 @@ class RefreshProfileFeedsTest extends TestCase
         Mail::fake();
 
         $authorized_profile = Profile::create(['username' => 'test user']);
-        AccessToken::createFromResponseArray($authorized_profile, $this->validTokenDetails());
+        $token = AccessToken::createFromResponseArray($authorized_profile, $this->validUserWithToken());
 
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
@@ -98,7 +99,7 @@ class RefreshProfileFeedsTest extends TestCase
         $mockClient->expects($this->once())
                    ->method('get')
                    ->with(
-                       $this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$authorized_profile->fresh()->accessToken()}")
+                       $this->equalTo($this->makeMediaUrl($token))
                    )
                    ->willThrowException(new \Exception(''));
 
@@ -123,7 +124,7 @@ class RefreshProfileFeedsTest extends TestCase
         Mail::fake();
 
         $authorized_profile = Profile::create(['username' => 'test user']);
-        AccessToken::createFromResponseArray($authorized_profile, $this->validTokenDetails());
+        $token = AccessToken::createFromResponseArray($authorized_profile, $this->validUserWithToken());
 
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
@@ -134,7 +135,7 @@ class RefreshProfileFeedsTest extends TestCase
         $mockClient->expects($this->once())
                    ->method('get')
                    ->with(
-                       $this->equalTo("https://api.instagram.com/v1/users/self/media/recent/?access_token={$authorized_profile->fresh()->accessToken()}")
+                       $this->equalTo($this->makeMediaUrl($token))
                    )
                    ->willThrowException(new BadTokenException(''));
 
@@ -148,5 +149,11 @@ class RefreshProfileFeedsTest extends TestCase
 
         $this->assertFalse($authorized_profile->fresh()->hasInstagramAccess());
         $this->assertEquals(0, AccessToken::count());
+    }
+
+    private function makeMediaUrl($token)
+    {
+        $limit = 20;
+        return sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, $limit, $token->access_code);
     }
 }
