@@ -4,13 +4,21 @@
 
 ## Easily include your Instagram feed(s) in your project.
 
-The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project. The package is made so that ideally the view is almost always just using cached data, and the feed itself will be updated at a schedule of your choosing, using Laravel's great scheduling features. The feed is also designed to be resilient, so that you can safely call it from your controllers without having to worry about errors breaking the page.
+The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project, using Instagram's Basic Display API. The package is made so that ideally the view is almost always just using cached data, and the feed itself will be updated at a schedule of your choosing, using Laravel's great scheduling features. The feed is also designed to be resilient, so that you can safely call it from your controllers without having to worry about network errors breaking the page.
 
 ### Installation
 
 ```
 composer require dymantic/laravel-instagram-feed
 ```
+
+**Note** You will need to use ^v2.0, as v1 used the old Legacy API which has been shut down.
+
+**Breaking changes from v1:** The feed now consists of entries that only contain the media type, and the media url. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now.
+
+### Before you start
+
+To use the Instagram Basic Display API, you will need to have a Facebook app set up with the correct permissions, etc. If you don't have this yet, head over to (the Facebook developer docs)[https://developers.facebook.com/docs/instagram-basic-display-api/getting-started] and follow the instructions.
 
 ### How Instagram Media is Handled
 
@@ -89,10 +97,7 @@ The feed will be a Laravel collection of items that have the following structure
 ```
 [
     'type' => 'image' // can be either image or video
-    'low' => 'url for low resolution image or low bandwidth video',
-    'thumb' => 'url for thumbnail image or low resolution video',
-    'standard' => 'url for standard resolution of image or video',
-    'likes' => 'The number of likes as integer',
+    'url' => 'source url for media',
 ]
 ```
 
