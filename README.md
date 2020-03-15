@@ -14,11 +14,11 @@ composer require dymantic/laravel-instagram-feed
 
 **Note** You will need to use ^v2.0, as v1 used the old Legacy API which has been shut down.
 
-**Breaking changes from v1:** The feed now consists of entries that only contain the media type, and the media url. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now.
+**Breaking changes from v1:** The feed now consists of entries that only contain the media type, and the media url. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now. You will also need to refresh your tokens, which expire every 60 days. See further down for more on that.
 
 ### Before you start
 
-To use the Instagram Basic Display API, you will need to have a Facebook app set up with the correct permissions, etc. If you don't have this yet, head over to (the Facebook developer docs)[https://developers.facebook.com/docs/instagram-basic-display-api/getting-started] and follow the instructions.
+To use the Instagram Basic Display API, you will need to have a Facebook app set up with the correct permissions, etc. If you don't have this yet, head over to [the Facebook developer docs](https://developers.facebook.com/docs/instagram-basic-display-api/getting-started) and follow the instructions.
 
 ### How Instagram Media is Handled
 
@@ -107,3 +107,6 @@ Obviously the feed needs to be updated, which is exactly what the `refreshFeed()
 
 This package includes an artisan command `php artisan instagram-feed:refresh`, that will refresh all authorised profiles, and handle errors if they occur. If you have an email address set in the config, that address will be notified in the case of an error. It is recommended to use Laravel's scheduling features to run this command as frequently as you see fit.
 
+### Refreshing access tokens
+
+The long lived access tokens for the API expire after 60 days. This package includes an artisan command that will handle this for you, you just need to ensure that it runs at least once every 60 days. The command is `php artisan instagram-feed:refresh-tokens`
