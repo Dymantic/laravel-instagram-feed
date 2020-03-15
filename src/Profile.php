@@ -72,7 +72,7 @@ class Profile extends Model
         return !! $this->latestToken();
     }
 
-    private function latestToken()
+    public function latestToken()
     {
         return $this->tokens()->latest()->first();
     }
