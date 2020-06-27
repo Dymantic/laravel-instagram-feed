@@ -7,6 +7,10 @@ It seems your authentication with Instagram has been invalidated. You will need 
 An error occurred while refreshing your instagram feed. You may want to investigate further.
 @endif
 
+@isset($error_message)
+{{ $error_message }}
+@endisset
+
 Thanks.
 
 Thanks,<br>
