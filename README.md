@@ -90,7 +90,13 @@ Once you have a profile, you may call the `getInstagramAuthUrl()` method on it t
 
 ### Getting the feed
 
+`Profile::feed($limit = 20)`
+
 Once you have an authenticated profile, you may call the `feed()` method on that profile. The first time the method is called the feed will be fetched from Instagram and it will the be cached forever. Consequent calls to the `feed()` method will simply fetch from the cache. The `feed()` method can be safely called without worrying about exceptions and errors, if something goes wrong, you will just receive an empty collection.
+
+##### Setting limits, and cache
+
+You can set the limit for the returned media items by passing your limit to the feed method. So if you want a limit of 66, you would do: `$profile->feed(66)`. The accepted range is 1 to 100. Once your feed has been fetched, it will be cached, and this result is what will be returned when future calls to the feed methods are made. This means if you want to increase your limit, for example to 88, you will have to call `$profile->refreshFeed(88)`
 
 The feed will be a Laravel collection of items that have the following structure:
 
@@ -104,6 +110,8 @@ The feed will be a Laravel collection of items that have the following structure
 ```
 
 ### Updating the feed
+
+`Profile::refreshFeed($limit = 20)`
 
 Obviously the feed needs to be updated, which is exactly what the `refreshFeed()` method on a Profile instance does. This method will return the same kind of collection as the `feed()` method if successful. However, this method will throw an Exception if one happens to occur (network failure, invalid token, etc).
 
