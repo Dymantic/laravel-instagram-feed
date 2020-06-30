@@ -245,17 +245,19 @@ class ProfilesTest extends TestCase
         $mockCLient = $this->createMock(SimpleClient::class);
         $mockCLient->expects($this->once())
                    ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token)))
+                   ->with($this->equalTo($this->makeMediaUrl($token, 33)))
                    ->willReturn($this->exampleMediaResponse());
 
         $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
             return $mockCLient;
         });
 
-        $feed = $profile->feed();
+        $feed = $profile->feed($limit = 33);
 
         $this->assertCount(4, $feed);
     }
+
+
 
     /**
      *@test
@@ -336,14 +338,14 @@ class ProfilesTest extends TestCase
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
                    ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token)))
+                   ->with($this->equalTo($this->makeMediaUrl($token, 44)))
                    ->willReturn($this->exampleMediaResponse());
 
         $this->app->bind(SimpleClient::class, function () use ($mockClient) {
             return $mockClient;
         });
 
-        $feed = $profile->refreshFeed();
+        $feed = $profile->refreshFeed($limit = 44);
         $this->assertCount(4, $feed);
         $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
     }
@@ -437,9 +439,8 @@ class ProfilesTest extends TestCase
         $this->assertEquals($expected, $profile->viewData());
     }
 
-    private function makeMediaUrl($token)
+    private function makeMediaUrl($token, $limit = 20)
     {
-        $limit = 20;
         return sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, $limit, $token->access_code);
     }
 }

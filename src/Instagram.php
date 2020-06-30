@@ -76,9 +76,8 @@ class Instagram
         return $this->http->get($url);
     }
 
-    public function fetchMedia(AccessToken $token)
+    public function fetchMedia(AccessToken $token, $limit = 20)
     {
-        $limit = 20;
         $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $limit, $token->access_code);
 
         try {

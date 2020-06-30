@@ -87,7 +87,7 @@ class Profile extends Model
         $this->tokens->each->delete();
     }
 
-    public function feed()
+    public function feed($limit = 20)
     {
         if(!$this->latestToken()) {
             return collect([]);
@@ -99,7 +99,7 @@ class Profile extends Model
         $instagram = app()->make(Instagram::class);
 
         try {
-            $feed = $instagram->fetchMedia($this->latestToken());
+            $feed = $instagram->fetchMedia($this->latestToken(), $limit);
             Cache::forever($this->cacheKey(), $feed);
 
             return collect($feed);
@@ -108,10 +108,10 @@ class Profile extends Model
         }
     }
 
-    public function refreshFeed()
+    public function refreshFeed($limit = 20)
     {
         $instagram = app()->make(Instagram::class);
-        $new_feed = $instagram->fetchMedia($this->latestToken());
+        $new_feed = $instagram->fetchMedia($this->latestToken(), $limit);
 
         Cache::forget($this->cacheKey());
         Cache::forever($this->cacheKey(), $new_feed);
