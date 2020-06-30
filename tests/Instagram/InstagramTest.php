@@ -151,7 +151,7 @@ class InstagramTest extends TestCase
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,children.media_type,children.media_url&limit=20&access_token={$token->access_code}";
+        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,children.media_type,children.media_url&limit=88&access_token={$token->access_code}";
 
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
@@ -162,7 +162,7 @@ class InstagramTest extends TestCase
         app()->instance(SimpleClient::class, $mockClient);
         $instagram = app(Instagram::class);
 
-        $feed = $instagram->fetchMedia($token);
+        $feed = $instagram->fetchMedia($token, $limit = 88);
 
         $expected = [
             [
