@@ -98,6 +98,8 @@ The feed will be a Laravel collection of items that have the following structure
 [
     'type' => 'image' // can be either image or video
     'url' => 'source url for media',
+    'id' => 'the media id',
+    'cation' => 'the media caption'
 ]
 ```
 
