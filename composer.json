@@ -10,10 +10,10 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "^6.3"
+    "guzzlehttp/guzzle": "^6.5"
   },
   "require-dev": {
-    "orchestra/testbench": "^3.6"
+    "orchestra/testbench": "^3.9"
   },
   "autoload": {
     "psr-4": {
