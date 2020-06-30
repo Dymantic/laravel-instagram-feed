@@ -168,18 +168,26 @@ class InstagramTest extends TestCase
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F',
+                'caption' => "test caption one",
+                'id' => '17853951361863258'
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
+                'id' => '18046738186210442',
+                'caption' => "test caption two",
             ],
             [
                 'type' => 'video',
                 'url' => 'https://video.xx.fbcdn.net/v/t50.2886-16/80075364_501004160505270_3520263354313331489_n.mp4?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=fXXNJuZcyXEAX8rD8l8&_nc_ht=video.xx&oh=e1cbd15a0f23db1f7d5a5f6ddd2ace83&oe=5E9400C7',
+                'id' => '18068269231170160',
+                'caption' => "test caption three"
             ],
             [
                 'type' => 'video',
                 'url' => 'https://video.xx.fbcdn.net/v/t50.2886-16/79391351_481629065798947_3744187809422239413_n.mp4?_nc_cat=102&vs=18083652679083225_3607239704&_nc_vs=HBkcFQAYJEdIZHF1d1FqWldFQkNyWUJBTFhtOWFENUJ2WXpia1lMQUFBRhUAACgAGAAbAYgHdXNlX29pbAExFQAAGAAWsrTUvY%2B%2Fn0AVAigCQzMsF0Ay90vGp%2B%2BeGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHXqBwA%3D&_nc_sid=59939d&efg=eyJ2ZW5jb2RlX3RhZyI6InZ0c192b2RfdXJsZ2VuLjcyMGZlZWQifQ%3D%3D&_nc_ohc=fO8GgEnZ468AX_Fk0Ib&_nc_ht=video.xx&oh=1731b5b44ac7a430e1f90596c15806c3&oe=5E916311&_nc_rid=d477a9015c',
+                'id' => '18033634498224799',
+                'caption' => "test caption four"
             ]
         ];
 
@@ -218,14 +226,20 @@ class InstagramTest extends TestCase
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F',
+                'caption' => "test caption one",
+                'id' => '17853951361863258',
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
+                'id' => '18046738186210442',
+                'caption' => "test caption two",
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790',
+                'id' => '18068269231170160',
+                'caption' => "test caption three"
             ],
         ];
 

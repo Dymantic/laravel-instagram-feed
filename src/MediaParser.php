@@ -28,6 +28,8 @@ class MediaParser
         return [
             'type' => 'image',
             'url'  => $media['media_url'],
+            'id' => $media['id'],
+            'caption' => $media['caption'],
         ];
 
     }
@@ -41,6 +43,8 @@ class MediaParser
         return [
             'type' => 'video',
             'url'  => $media['media_url'],
+            'id' => $media['id'],
+            'caption' => $media['caption'],
         ];
     }
 
@@ -54,6 +58,8 @@ class MediaParser
         return [
             'type' => strtolower($use['media_type']),
             'url'  => $use['media_url'],
+            'id' => $media['id'],
+            'caption' => $media['caption']
         ];
     }
 
