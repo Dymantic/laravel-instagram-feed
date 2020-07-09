@@ -29,7 +29,8 @@ class MediaParser
             'type' => 'image',
             'url'  => $media['media_url'],
             'id' => $media['id'],
-            'caption' => $media['caption'],
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
+            'permalink' => $media['permalink']
         ];
 
     }
@@ -44,7 +45,8 @@ class MediaParser
             'type' => 'video',
             'url'  => $media['media_url'],
             'id' => $media['id'],
-            'caption' => $media['caption'],
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
+            'permalink' => $media['permalink']
         ];
     }
 
@@ -59,7 +61,8 @@ class MediaParser
             'type' => strtolower($use['media_type']),
             'url'  => $use['media_url'],
             'id' => $media['id'],
-            'caption' => $media['caption']
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
+            'permalink' => $media['permalink']
         ];
     }
 
