@@ -27,9 +27,12 @@ class RefreshAuthorizedFeeds extends Command
                 if ($e instanceof BadTokenException) {
                     $profile->clearToken();
                 }
-                Mail::to(
-                    config('instagram-feed.notify_on_error'))->send(new FeedRefreshFailed($profile->fresh(), $e->getMessage())
-                );
+
+                if(config('instagram-feed.notify_on_error', null) != 'null') {
+                    Mail::to(
+                        config('instagram-feed.notify_on_error'))->send(new FeedRefreshFailed($profile->fresh(), $e->getMessage())
+                    );
+                }
             }
         });
     }
