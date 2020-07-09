@@ -231,18 +231,21 @@ class InstagramTest extends TestCase
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F',
                 'caption' => "test caption one",
+                'permalink' => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'id' => '17853951361863258',
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
                 'id' => '18046738186210442',
+                "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'caption' => "test caption two",
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790',
                 'id' => '18068269231170160',
+                "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'caption' => "test caption three"
             ],
         ];

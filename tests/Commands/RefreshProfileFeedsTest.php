@@ -29,6 +29,7 @@ class RefreshProfileFeedsTest extends TestCase
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
+        $this->app['config']->set('instagram-feed.notify_on_error', true);
 
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->exactly(2))
@@ -61,6 +62,7 @@ class RefreshProfileFeedsTest extends TestCase
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
+        $this->app['config']->set('instagram-feed.notify_on_error', true);
 
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
