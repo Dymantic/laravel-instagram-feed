@@ -14,7 +14,7 @@ composer require dymantic/laravel-instagram-feed
 
 **Note** You will need to use ^v2.0, as v1 used the old Legacy API which has been shut down.
 
-**Breaking changes from v1:** The feed now consists of entries that only contain the media type, and the media url. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now. You will also need to refresh your tokens, which expire every 60 days. See further down for more on that.
+**Breaking changes from v1:** The feed now consists of entries that only contain the media type, media url, caption, id and permalink. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now. You will also need to refresh your tokens, which expire every 60 days. See further down for more on that.
 
 ### Before you start
 
