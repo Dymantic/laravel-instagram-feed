@@ -14,7 +14,7 @@ class Instagram
     const EXCHANGE_TOKEN_FORMAT = "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=%s&access_token=%s";
     const REFRESH_TOKEN_FORMAT = "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%s";
     const MEDIA_URL_FORMAT = "https://graph.instagram.com/%s/media?fields=%s&limit=%s&access_token=%s";
-    const MEDIA_FIELDS = "caption,id,media_type,media_url,thumbnail_url,children.media_type,children.media_url";
+    const MEDIA_FIELDS = "caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url";
 
 
     private $client_id;
