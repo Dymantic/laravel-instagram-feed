@@ -38,4 +38,10 @@ return [
      * the entire carousel will be ignored.
      */
     'ignore_video' => false,
+
+    /*
+     * You may set an email address below if you wish to be notified of errors when
+     * attempting to refresh the Instagram feed.
+     */
+    'notify_on_error' => null,
 ];
