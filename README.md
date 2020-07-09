@@ -74,7 +74,13 @@ return [
      * will become the first image in the carousel, and if there are no images, then
      * the entire carousel will be ignored.
      */
-        'ignore_video' => false,
+     'ignore_video' => false,
+
+    /*
+     * You may set an email address below if you wish to be notified of errors when
+     * attempting to refresh the Instagram feed.
+     */
+    'notify_on_error' => null,
 ];
 ```
 
@@ -105,7 +111,8 @@ The feed will be a Laravel collection of items that have the following structure
     'type' => 'image' // can be either image or video
     'url' => 'source url for media',
     'id' => 'the media id',
-    'cation' => 'the media caption'
+    'caption' => 'the media caption',
+    'permalink' => 'the permalink for accessing the post'
 ]
 ```
 
