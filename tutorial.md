@@ -1,13 +1,15 @@
+# Using this package to show your INstagram feed on your site
+
 There are four different things you need to do, or know about, to use this package as you want. They are:
 
 1. Generating profiles (a profile represents an Instagram user)
-2. Getting permission frm the Instagram user for your app to access their feed. This is the most annoying and potentially confusing part.
+2. Getting permission from the Instagram user for your app to access their feed. This is the most annoying and potentially confusing part.
 3. Fetching the actual feed from Instagram.
 4. Displaying the feed on your website.
 
 ### Profiles
 
-Profiles are there to represent Instgarm users. Your database will need to store access tokens, and these profiles provide a place for that. All you need to care about is giving a profile a username that you can use to get the profile again when you need.
+Profiles are there to represent Instagram users. Your database will need to store access tokens, and these profiles provide a place for that. All you need to care about is giving a profile a username that you can use to get the profile again when you need.
 
 There are two ways to create a profile. Either directly in your code `$profile = \Dymantic\InstagramFeed\Profile::create(['username' => 'michael'])` or you can use an artisan command `php artisan instagram-feed:profile michael`.
 
@@ -15,9 +17,9 @@ Then when you need to fetch the profile, you can use Eloquent as for any other m
 
 ### Getting auth (The OAuth flow)
 
-For this part you need to make sure your config in `config/instagram-feed.php` has been completed, and you need to set up some routes. The simplest way we can do it is to set up three routes.
+For this part you need to make sure your config in `config/instagram-feed.php` has been completed, and you need to set up some routes. The simplest way we can do this is in three steps:
 
-First, we need a route to a page where we will present a link for our Instagram user (most likely you) to click and begin the auth process. You probably don't want the general public to access this page or route, only you/the Instagram user. Once the user clicks on the link, they will be taken to an Instagram page where they will need to agree to give permission for your app/site to use their feed.
+First, we need a route to a page where we will present a link for our Instagram user (most likely ourselves) to click and begin the auth process. You probably don't want the general public to access this page or route, only you/the Instagram user. Once the user clicks on the link, they will be taken to an Instagram page where they will need to agree to give permission for your app/site to use their feed.
 
 ```
 //routes file
@@ -35,13 +37,17 @@ public function show() {
 <a href="{{ $instagram_auth_url }}">Click to get Instgram permission</a>
 ```
 
+You should now be able to visit that route in your browser and see the link. Do that and click on it.
+
 Next, we need a route that Instagram will redirect the user to once they have given permission. This is what matches the redirect url in your Facebook app settings, and the `auth_callback_route` in your config file. You don't need to make a controller or view for this route.
 
 ```
 //in your Facebook app settings
 Valid OAuth Redirect URIs: https://example.test/instagram/auth/callback
 
-Then your config should have the route that matches everything after the forward slash following your app_url (https://example.test/ in this case). Note that you can use more than one url in your Facebook settings, so you can add a url for local dev as well.
+Then your config should have the route that matches everything after the forward slash following your app_url (https://example.test/ in this case).
+
+Note that you can use more than one url in your Facebook settings, so you can add a url for local dev as well.
 
 //in config/instagram-feed.php
 'auth_callback_route' => 'instagram/auth/callback',
