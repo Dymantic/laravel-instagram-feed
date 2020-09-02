@@ -16,6 +16,10 @@ composer require dymantic/laravel-instagram-feed
 
 **Breaking changes from v1:** The feed now consists of entries that only contain the media type, media url, caption, id and permalink. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now. You will also need to refresh your tokens, which expire every 60 days. See further down for more on that.
 
+## Tutorial
+
+Some parts of this whole thing can be a bit confusing, especially if you are not familiar with following the OAuth flow. I have included [a tutorial](tutorial.md) to try help make things a bit more clear. Feedback or improvements on this would be most appreciated.
+
 ### Before you start
 
 To use the Instagram Basic Display API, you will need to have a Facebook app set up with the correct permissions, etc. If you don't have this yet, head over to [the Facebook developer docs](https://developers.facebook.com/docs/instagram-basic-display-api/getting-started) and follow the instructions.
