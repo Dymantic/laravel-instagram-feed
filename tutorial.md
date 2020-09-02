@@ -1,4 +1,4 @@
-# Using this package to show your INstagram feed on your site
+# Using this package to show your Instagram feed on your site
 
 There are four different things you need to do, or know about, to use this package as you want. They are:
 
