@@ -22,7 +22,7 @@ class SimpleClient
     {
         $response = $this->client->get($url);
 
-        return \GuzzleHttp\json_decode($response->getBody(), true);
+        return \GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_BIGINT_AS_STRING);
     }
 
     public function post($url, $options)
