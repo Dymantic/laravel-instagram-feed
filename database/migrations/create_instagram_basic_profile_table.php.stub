@@ -22,6 +22,6 @@ class CreateInstagramBasicProfileTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dymantic_instagram_basic_profile');
+        Schema::dropIfExists('dymantic_instagram_basic_profiles');
     }
 }
