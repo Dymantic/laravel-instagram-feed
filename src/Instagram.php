@@ -14,7 +14,7 @@ class Instagram
     const EXCHANGE_TOKEN_FORMAT = "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=%s&access_token=%s";
     const REFRESH_TOKEN_FORMAT = "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%s";
     const MEDIA_URL_FORMAT = "https://graph.instagram.com/%s/media?fields=%s&limit=%s&access_token=%s";
-    const MEDIA_FIELDS = "caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url";
+    const MEDIA_FIELDS = "caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url,timestamp";
 
 
     private $client_id;
@@ -42,11 +42,11 @@ class Instagram
     public function requestTokenForProfile($profile, $auth_request)
     {
         return $this->http->post(static::REQUEST_ACCESS_TOKEN_URL, [
-            'client_id'     => $this->client_id,
+            'client_id' => $this->client_id,
             'client_secret' => $this->client_secret,
-            'grant_type'    => 'authorization_code',
-            'redirect_uri'  => $this->redirectUriForProfile($profile->id),
-            'code'          => $auth_request->get('code')
+            'grant_type' => 'authorization_code',
+            'redirect_uri' => $this->redirectUriForProfile($profile->id),
+            'code' => $auth_request->get('code')
         ]);
     }
 
@@ -92,13 +92,33 @@ class Instagram
             }
         }
 
-        return collect($response['data'])
-            ->map(function($media) {
+        $page = true;
+        $collection = collect($response['data']);
+        $page_count = 1;
+        while ($page !== false) {
+            if (isset($response['paging'])) {
+                if (isset($response['paging']['next'])) {
+                    $page = $response['paging']['next'];
+                    var_dump(['page'.$page_count]);
+                    $response = $this->http->get($page);
+                    $col2 = collect($response['data']);
+                    $collection = $col2->merge($collection);
+                    $page_count++;
+                } else {
+                    $page = false;
+                }
+            } else {
+                $page = false;
+            }
+        }
+
+        return $collection
+            ->map(function ($media) {
                 return MediaParser::parseItem($media, config('instagram-feed.ignore_video', false));
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->all();
+            })->sortByDesc('timestamp')->splice(0, $limit)->all();
     }
 
 
