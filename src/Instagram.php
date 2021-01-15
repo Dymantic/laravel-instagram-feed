@@ -76,9 +76,19 @@ class Instagram
         return $this->http->get($url);
     }
 
-    public function fetchMedia(AccessToken $token, $limit = 20)
+    public function fetchMedia(AccessToken $token, $limit = null)
     {
-        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $limit, $token->access_code);
+        $queryLimit = $limit; //optimal number of requests
+
+        if ($limit === null || $limit > 1000) {
+            $queryLimit = 100;
+        } elseif ($limit <= 100) {
+            $queryLimit = $limit;
+        } elseif ($limit > 100) {
+            $queryLimit = (int) ceil( $queryLimit/ ceil($queryLimit/100) );
+        }
+
+        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $queryLimit, $token->access_code);
 
         try {
             $response = $this->http->get($url);
@@ -92,19 +102,27 @@ class Instagram
             }
         }
 
-        $page = true;
+
         $collection = collect($response['data']);
-        while ($page !== false) {
-            if (isset($response['paging'])) {
-                if (isset($response['paging']['next'])) {
-                    $page = $response['paging']['next'];
-                    $response = $this->http->get($page);
-                    $collection = $collection->merge(collect($response['data']));
+        if ($limit === null || $limit > 99) {
+            $page = true;
+
+            while ($page !== false) {
+                if (isset($response['paging'])) {
+                    if (isset($response['paging']['next'])) {
+                        $page = $response['paging']['next'];
+                        $response = $this->http->get($page);
+                        $collection = $collection->merge(collect($response['data']));
+
+                        if ($collection->count() > $limit) { //limit reached
+                            $page = false;
+                        }
+                    } else {
+                        $page = false;
+                    }
                 } else {
                     $page = false;
                 }
-            } else {
-                $page = false;
             }
         }
 
