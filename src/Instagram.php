@@ -94,17 +94,12 @@ class Instagram
 
         $page = true;
         $collection = collect($response['data']);
-        $page_count = 1;
         while ($page !== false) {
             if (isset($response['paging'])) {
                 if (isset($response['paging']['next'])) {
                     $page = $response['paging']['next'];
-                    var_dump(['page'.$page_count]);
-
                     $response = $this->http->get($page);
-
                     $collection = $collection->merge(collect($response['data']));
-                    $page_count++;
                 } else {
                     $page = false;
                 }
