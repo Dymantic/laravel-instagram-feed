@@ -95,7 +95,7 @@ class Instagram
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->sortByDesc('timestamp')->splice(0, $limit)->all();
+            })->sortByDesc('timestamp')->take($limit);
     }
 
     private function getPageSize($limit) {
