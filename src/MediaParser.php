@@ -31,7 +31,7 @@ class MediaParser
             'id' => $media['id'],
             'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
             'permalink' => $media['permalink'],
-            'timestamp' => $media['timestamp']
+            'timestamp' => $media['timestamp'] ?? ''
         ];
 
     }
@@ -48,7 +48,7 @@ class MediaParser
             'id' => $media['id'],
             'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
             'permalink' => $media['permalink'],
-            'timestamp' => $media['timestamp']
+            'timestamp' => $media['timestamp'] ?? ''
         ];
     }
 
@@ -65,7 +65,7 @@ class MediaParser
             'id' => $media['id'],
             'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
             'permalink' => $media['permalink'],
-            'timestamp' => $media['timestamp']
+            'timestamp' => $media['timestamp'] ?? ''
         ];
     }
 

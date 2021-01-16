@@ -76,54 +76,17 @@ class Instagram
         return $this->http->get($url);
     }
 
-    public function fetchMedia(AccessToken $token, $limit = null)
+    public function fetchMedia(AccessToken $token, $limit = 20)
     {
-        $queryLimit = $limit; //optimal number of requests
 
-        if ($limit === null || $limit > 1000) {
-            $queryLimit = 100;
-        } elseif ($limit <= 100) {
-            $queryLimit = $limit;
-        } elseif ($limit > 100) {
-            $queryLimit = (int) ceil( $queryLimit/ ceil($queryLimit/100) );
-        }
+        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $this->getPageSize($limit), $token->access_code);
 
-        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $queryLimit, $token->access_code);
-
-        try {
-            $response = $this->http->get($url);
-        } catch (ClientException $e) {
-            $response = json_decode($e->getResponse()->getBody(), true);
-            $error_type = $response['meta']['error_type'] ?? 'unknown';
-            if ($error_type === 'OAuthAccessTokenException') {
-                throw new BadTokenException('The token is invalid');
-            } else {
-                throw $e;
-            }
-        }
-
-
+        $response = $this->fetchResponseData($url);
         $collection = collect($response['data']);
-        if ($limit === null || $limit > 99) {
-            $page = true;
 
-            while ($page !== false) {
-                if (isset($response['paging'])) {
-                    if (isset($response['paging']['next'])) {
-                        $page = $response['paging']['next'];
-                        $response = $this->http->get($page);
-                        $collection = $collection->merge(collect($response['data']));
-
-                        if ($collection->count() > $limit) { //limit reached
-                            $page = false;
-                        }
-                    } else {
-                        $page = false;
-                    }
-                } else {
-                    $page = false;
-                }
-            }
+        while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
+            $response = $this->fetchResponseData($response['paging']['next']);
+            $collection = $collection->merge($response['data']);
         }
 
         return $collection
@@ -133,6 +96,29 @@ class Instagram
             ->reject(function ($media) {
                 return is_null($media);
             })->sortByDesc('timestamp')->splice(0, $limit)->all();
+    }
+
+    private function getPageSize($limit) {
+        return min($limit, 100);
+    }
+
+    private function shouldFetchNextPage($previous_response, $current_count, $limit) {
+        $max = $limit ?? 1000;
+        return ($previous_response['paging']['next'] ?? false) && ($current_count <= $max);
+    }
+
+    private function fetchResponseData($url) {
+        try {
+            return $response = $this->http->get($url);
+        } catch (ClientException $e) {
+            $response = json_decode($e->getResponse()->getBody(), true);
+            $error_type = $response['meta']['error_type'] ?? 'unknown';
+            if ($error_type === 'OAuthAccessTokenException') {
+                throw new BadTokenException('The token is invalid');
+            } else {
+                throw $e;
+            }
+        }
     }
 
 

@@ -93,9 +93,11 @@ trait FakesInstagramCalls
         ];
     }
 
-    private function exampleMediaResponse()
+    private function exampleMediaResponse($with_next_page = false)
     {
-        return json_decode(file_get_contents("./tests/basic_display_media_response_200.json"), true);
+        return $with_next_page ?
+        json_decode(file_get_contents("./tests/basic_display_media_response_200.json"), true) :
+        json_decode(file_get_contents("./tests/basic_display_media_response_200_no_next_page.json"), true);
     }
 
 
