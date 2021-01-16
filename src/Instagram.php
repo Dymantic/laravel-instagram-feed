@@ -99,7 +99,7 @@ class Instagram
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->sortByDesc('timestamp')->take($limit)->values();
+            })->sortByDesc('timestamp')->take($limit ?? $collection->count())->values();
     }
 
     public function ignoreVideo($media)
