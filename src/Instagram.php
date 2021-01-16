@@ -78,24 +78,36 @@ class Instagram
 
     public function fetchMedia(AccessToken $token, $limit = 20)
     {
-
         $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $this->getPageSize($limit), $token->access_code);
 
         $response = $this->fetchResponseData($url);
-        $collection = collect($response['data']);
-
+        $collection = collect($response['data'])->reject(function ($media) {
+            return $this->ignoreVideo($media);
+        });
+        
         while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
             $response = $this->fetchResponseData($response['paging']['next']);
-            $collection = $collection->merge($response['data']);
+            $collection = $collection->merge($response['data'])
+                ->reject(function ($media) {
+                    return $this->ignoreVideo($media);
+                });
         }
 
-        return $collection
+        $collection
             ->map(function ($media) {
                 return MediaParser::parseItem($media, config('instagram-feed.ignore_video', false));
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->sortByDesc('timestamp')->take($limit);
+            })->sortByDesc('timestamp')->take($limit)->values();
+    }
+
+    public function ignoreVideo($media)
+    {
+        if (config('instagram-feed.ignore_video', false) && ($media['media_type'] == 'VIDEO')) {
+            return $media['media_type'] == 'VIDEO';
+        }
+        return false;
     }
 
     private function getPageSize($limit) {
