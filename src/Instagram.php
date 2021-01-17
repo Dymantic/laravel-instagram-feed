@@ -86,6 +86,7 @@ class Instagram
         });
         
         while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
+
             $response = $this->fetchResponseData($response['paging']['next']);
             $collection = $collection->merge($response['data'])
                 ->reject(function ($media) {
@@ -93,13 +94,13 @@ class Instagram
                 });
         }
 
-        $collection
+        return $collection
             ->map(function ($media) {
                 return MediaParser::parseItem($media, config('instagram-feed.ignore_video', false));
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->sortByDesc('timestamp')->take($limit ?? $collection->count())->values();
+            })->sortByDesc('timestamp')->take($limit ?? $collection->count())->values()->all();
     }
 
     public function ignoreVideo($media)
