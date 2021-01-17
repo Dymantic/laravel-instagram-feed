@@ -28,6 +28,10 @@ To use the Instagram Basic Display API, you will need to have a Facebook app set
 
 Instagram provides three media types through this API: image, video and carousel. This package simplifies that into just a feed of images and videos. You may use the `ignore_video` config option if you don't want to include any videos. For carousel items, the first item of the carousel is used. If video is to be ignored, and the first image will be used, if it exists.
 
+##### Note on ignoring video
+
+If you chose to ignore video, your feed size may be smaller than the limit you requested. If you expect to be ignoring video posts you may want to increase how many posts you fetch (see "Getting the Feed" below).
+
 ### Setup
 
 `php artisan vendor:publish` to publish the necessary migrations and config, and `php artisan migrate` to run migrations.
@@ -104,9 +108,15 @@ Once you have a profile, you may call the `getInstagramAuthUrl()` method on it t
 
 Once you have an authenticated profile, you may call the `feed()` method on that profile. The first time the method is called the feed will be fetched from Instagram and it will the be cached forever. Consequent calls to the `feed()` method will simply fetch from the cache. The `feed()` method can be safely called without worrying about exceptions and errors, if something goes wrong, you will just receive an empty collection.
 
+##### Fetching all posts (no limit)
+
+If you want to fetch all your posts (up to the last 1000), you may pass `null` as the limit parameter to your `refreshFeed` or `feed` method. The package will make multiple requests to fetch all your previous posts up to 1000. You may then use the timestamp on the posts to sort, paginate, etc.
+
 ##### Setting limits, and cache
 
-You can set the limit for the returned media items by passing your limit to the feed method. So if you want a limit of 66, you would do: `$profile->feed(66)`. The accepted range is 1 to 100. Once your feed has been fetched, it will be cached, and this result is what will be returned when future calls to the feed methods are made. This means if you want to increase your limit, for example to 88, you will have to call `$profile->refreshFeed(88)`
+You can set the limit for the returned media items by passing your limit to the feed method. So if you want a limit of 66, you would do: `$profile->feed(66)`. Once your feed has been fetched, it will be cached, and this result is what will be returned when future calls to the feed methods are made. This means if you want to increase your limit, for example to 88, you will have to call `$profile->refreshFeed(88)`
+
+Remember that if you chose to ignore video, your feed size may be smaller than the limit you requested. If you expect to be ignoring video posts you may want to increase how many posts you fetch.
 
 The feed will be a Laravel collection of items that have the following structure:
 
@@ -116,7 +126,8 @@ The feed will be a Laravel collection of items that have the following structure
     'url' => 'source url for media',
     'id' => 'the media id',
     'caption' => 'the media caption',
-    'permalink' => 'the permalink for accessing the post'
+    'permalink' => 'the permalink for accessing the post',
+    'timestamp' => 'the timestamp of the post',
 ]
 ```
 
