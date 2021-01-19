@@ -151,7 +151,7 @@ class InstagramTest extends TestCase
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url&limit=88&access_token={$token->access_code}";
+        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url,timestamp&limit=88&access_token={$token->access_code}";
 
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
@@ -171,6 +171,7 @@ class InstagramTest extends TestCase
                 'caption' => "test caption one",
                 'id' => '17853951361863258',
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
+                'timestamp' => '',
             ],
             [
                 'type' => 'image',
@@ -178,6 +179,7 @@ class InstagramTest extends TestCase
                 'id' => '18046738186210442',
                 'caption' => "test caption two",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
+                'timestamp' => '',
             ],
             [
                 'type' => 'video',
@@ -185,6 +187,7 @@ class InstagramTest extends TestCase
                 'id' => '18068269231170160',
                 'caption' => "test caption three",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
+                'timestamp' => '',
             ],
             [
                 'type' => 'video',
@@ -192,11 +195,43 @@ class InstagramTest extends TestCase
                 'id' => '18033634498224799',
                 'caption' => "test caption four",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
+                'timestamp' => '',
             ]
         ];
 
         $this->assertCount(4, $feed);
         $this->assertEquals($expected, $feed);
+    }
+
+    /**
+     * @test
+     */
+    public function it_makes_multiple_calls_to_fetch_up_to_limit() {
+        $profile = Profile::create(['username' => 'test user']);
+        $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
+
+        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url,timestamp&limit=7&access_token={$token->access_code}";
+
+        //expected second url is copied from dummy response returned in first call
+        $next_url = "https://graph.instagram.com/v1.0/17841403475633812/media?access_token=IGQVJVRkN2WHRsVi1hWkcxbVNWZA09FZAmFod1hVdXVNVmVvajFLdG5fdnA5WUFwSTdIZAUJ0MVBkWFgtYXE0TmQyeHp1cjlpaWpjeGNkUUtHak9nOFIydF9VRm1KQmlKUlRTaXlyaDNpMFR5SFUtTTYtMQZDZD&pretty=1&fields=id%2Cmedia_type%2Cmedia_url%2Ccaption%2Cthumbnail_url%2Cchildren.media_type%2Cchildren.media_url&limit=25&after=QVFIUnJpVDFsaS02bXhyUVNBSWZABLXNMMlY4MUFqb0dXREozUkNvYmlDb3JlR2RaMFhUd0puZA18waEJUVXZADbnRnV0FWR1VCbWVZARHZAONDhZAbjkxbFpESTln";
+
+        $mockClient = $this->createMock(SimpleClient::class);
+        $mockClient->expects($this->exactly(2))
+                   ->method('get')
+                   ->withConsecutive(
+                       [$this->equalTo("$expected_url")],
+                       [$this->equalTo("$next_url")]
+                    )
+                   ->willReturn($this->exampleMediaResponse($with_next_page = true));
+
+        app()->instance(SimpleClient::class, $mockClient);
+        $instagram = app(Instagram::class);
+
+        $feed = $instagram->fetchMedia($token, $limit = 7);
+
+        
+
+        $this->assertCount(7, $feed);
     }
 
     /**
@@ -233,6 +268,7 @@ class InstagramTest extends TestCase
                 'caption' => "test caption one",
                 'permalink' => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'id' => '17853951361863258',
+                'timestamp' => '',
             ],
             [
                 'type' => 'image',
@@ -240,13 +276,15 @@ class InstagramTest extends TestCase
                 'id' => '18046738186210442',
                 "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'caption' => "test caption two",
+                'timestamp' => '',
             ],
             [
                 'type' => 'image',
                 'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790',
                 'id' => '18068269231170160',
                 "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
-                'caption' => "test caption three"
+                'caption' => "test caption three",
+                'timestamp' => '',
             ],
         ];
 

@@ -27,10 +27,11 @@ class MediaParser
     {
         return [
             'type' => 'image',
-            'url'  => $media['media_url'],
+            'url' => $media['media_url'],
             'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
-            'permalink' => $media['permalink']
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
+            'permalink' => $media['permalink'],
+            'timestamp' => $media['timestamp'] ?? ''
         ];
 
     }
@@ -43,26 +44,28 @@ class MediaParser
 
         return [
             'type' => 'video',
-            'url'  => $media['media_url'],
+            'url' => $media['media_url'],
             'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
-            'permalink' => $media['permalink']
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
+            'permalink' => $media['permalink'],
+            'timestamp' => $media['timestamp'] ?? ''
         ];
     }
 
     private static function parseAsCarousel($media, $ignore_video)
     {
         $use = collect($media['children']['data'])
-            ->first(function($child) use ($ignore_video) {
+            ->first(function ($child) use ($ignore_video) {
                 return $child['media_type'] === 'IMAGE' || (!$ignore_video);
             });
 
         return [
             'type' => strtolower($use['media_type']),
-            'url'  => $use['media_url'],
+            'url' => $use['media_url'],
             'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : NULL),
-            'permalink' => $media['permalink']
+            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
+            'permalink' => $media['permalink'],
+            'timestamp' => $media['timestamp'] ?? ''
         ];
     }
 
@@ -77,9 +80,9 @@ class MediaParser
     private static function extractVideo($media)
     {
         return [
-            'type'     => 'video',
-            'low'      => $media['low_bandwidth']['url'] ?? null,
-            'thumb'    => $media['low_resolution']['url'] ?? null,
+            'type' => 'video',
+            'low' => $media['low_bandwidth']['url'] ?? null,
+            'thumb' => $media['low_resolution']['url'] ?? null,
             'standard' => $media['standard_resolution']['url'] ?? null,
         ];
     }
@@ -87,9 +90,9 @@ class MediaParser
     private static function extractImage($media)
     {
         return [
-            'type'     => 'image',
-            'low'      => $media['low_resolution']['url'] ?? null,
-            'thumb'    => $media['thumbnail']['url'] ?? null,
+            'type' => 'image',
+            'low' => $media['low_resolution']['url'] ?? null,
+            'thumb' => $media['thumbnail']['url'] ?? null,
             'standard' => $media['standard_resolution']['url'] ?? null,
         ];
     }
