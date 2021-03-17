@@ -1,5 +1,5 @@
+/.idea
 /vendor
-/.idea
 .DS_Store
-/.idea
 .phpunit.*
+composer.lock
