@@ -13,13 +13,15 @@ class MediaParser
         switch ($type) {
             case 'IMAGE':
                 return static::parseAsImage($media);
-                break;
+
             case 'VIDEO':
                 return static::parseAsVideo($media, $ignore_video);
-                break;
+
             case 'CAROUSEL_ALBUM':
                 return static::parseAsCarousel($media, $ignore_video);
-                break;
+
+            default:
+                return null;
         }
     }
 
@@ -33,7 +35,6 @@ class MediaParser
             'permalink' => $media['permalink'],
             'timestamp' => $media['timestamp'] ?? ''
         ];
-
     }
 
     private static function parseAsVideo($media, $ignore_video)

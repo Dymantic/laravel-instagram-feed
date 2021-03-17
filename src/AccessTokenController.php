@@ -4,22 +4,28 @@
 namespace Dymantic\InstagramFeed;
 
 
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Redirect;
+
 class AccessTokenController
 {
-    public function handleRedirect()
+    public function handleRedirect(Request $request)
     {
-        $profile = Profile::find((int)request('state'));
+        /** @var Profile|null $profile */
+        $profile = Profile::query()->find((int) $request->input('state'));
 
-        if(! $profile) {
-            return redirect(config('instagram-feed.failure_redirect_to'));
+        if (!$profile) {
+            return Redirect::to(Config::get('instagram-feed.failure_redirect_to'));
         }
 
         try {
-            $result = $profile->requestToken(request());
-        } catch(\Exception $e) {
-            return redirect(config('instagram-feed.failure_redirect_to'));
+            $profile->requestToken($request);
+        } catch (Exception $e) {
+            return Redirect::to(Config::get('instagram-feed.failure_redirect_to'));
         }
 
-        return redirect(config('instagram-feed.success_redirect_to'));
+        return Redirect::to(Config::get('instagram-feed.success_redirect_to'));
     }
 }
