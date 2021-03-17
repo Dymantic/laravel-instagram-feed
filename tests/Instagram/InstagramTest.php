@@ -151,7 +151,7 @@ class InstagramTest extends TestCase
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url,timestamp&limit=88&access_token={$token->access_code}";
+        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children{media_type,media_url},timestamp&limit=88&access_token={$token->access_code}";
 
         $mockClient = $this->createMock(SimpleClient::class);
         $mockClient->expects($this->once())
@@ -210,7 +210,7 @@ class InstagramTest extends TestCase
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children.media_type,children.media_url,timestamp&limit=7&access_token={$token->access_code}";
+        $expected_url = "https://graph.instagram.com/{$token->user_id}/media?fields=caption,id,media_type,media_url,thumbnail_url,permalink,children{media_type,media_url},timestamp&limit=7&access_token={$token->access_code}";
 
         //expected second url is copied from dummy response returned in first call
         $next_url = "https://graph.instagram.com/v1.0/17841403475633812/media?access_token=IGQVJVRkN2WHRsVi1hWkcxbVNWZA09FZAmFod1hVdXVNVmVvajFLdG5fdnA5WUFwSTdIZAUJ0MVBkWFgtYXE0TmQyeHp1cjlpaWpjeGNkUUtHak9nOFIydF9VRm1KQmlKUlRTaXlyaDNpMFR5SFUtTTYtMQZDZD&pretty=1&fields=id%2Cmedia_type%2Cmedia_url%2Ccaption%2Cthumbnail_url%2Cchildren.media_type%2Cchildren.media_url&limit=25&after=QVFIUnJpVDFsaS02bXhyUVNBSWZABLXNMMlY4MUFqb0dXREozUkNvYmlDb3JlR2RaMFhUd0puZA18waEJUVXZADbnRnV0FWR1VCbWVZARHZAONDhZAbjkxbFpESTln";
@@ -329,20 +329,18 @@ class InstagramTest extends TestCase
 
     private function mockClientException()
     {
-        $mock = $this->createMock(ClientException::class);
-        $mock->expects($this->once())
-             ->method('getResponse')
-             ->willReturn(new class {
-                 public function getBody() {
-                     return json_encode([
-                         'meta' => [
-                             'code' => 400,
-                             'error_type' => 'OAuthAccessTokenException',
-                             'error_message' => 'The access_token provided is invalid'
-                         ]
-                     ]);
-                 }
-             });
+        $response = new \GuzzleHttp\Psr7\Response(200, [], json_encode([
+            'meta' => [
+                'code' => 400,
+                'error_type' => 'OAuthAccessTokenException',
+                'error_message' => 'The access_token provided is invalid'
+            ]
+        ]));
+        
+        $mock = $this->createStub(ClientException::class);
+        $mock->method('getResponse')
+             ->willReturn($response);
+
 
         return $mock;
     }
