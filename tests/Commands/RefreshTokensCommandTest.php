@@ -36,12 +36,12 @@ class RefreshTokensCommandTest extends TestCase
         ]);
 
         $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->at(0))
+        $mockClient->expects($this->exactly(2))
                    ->method('get')
                    ->with($this->equalTo($this->makeRefreshUrl($tokenA)))
                    ->willReturn($this->refreshedLongLivedToken());
 
-        $mockClient->expects($this->at(1))
+        $mockClient->expects($this->exactly(2))
                    ->method('get')
                    ->with($this->equalTo($this->makeRefreshUrl($tokenA)))
                    ->willReturn($this->refreshedLongLivedToken());

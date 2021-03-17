@@ -78,7 +78,7 @@ class ProfilesTest extends TestCase
         $profile = Profile::create(['username' => 'test_user']);
 
         $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->at(0))
+        $mockClient->expects($this->once())
                    ->method('post')
                    ->with($this->equalTo("https://api.instagram.com/oauth/access_token"), $this->equalTo([
                        'client_id'     => 'TEST_CLIENT_ID',
@@ -89,16 +89,12 @@ class ProfilesTest extends TestCase
                    ]))
                    ->willReturn($this->validTokenDetails());
 
-        $mockClient->expects($this->at(1))
+        $mockClient->expects($this->exactly(2))
             ->method('get')
-            ->with($this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username&access_token=VALID_ACCESS_TOKEN"))
-            ->willReturn($this->validUserDetails());
-
-        $mockClient->expects($this->at(2))
-                   ->method('get')
-                   ->with($this->equalTo("https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=TEST_CLIENT_SECRET&access_token=VALID_ACCESS_TOKEN"))
-                   ->willReturn($this->validLongLivedToken());
-
+            ->withConsecutive(
+                [$this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username&access_token=VALID_ACCESS_TOKEN")],
+                [$this->equalTo("https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=TEST_CLIENT_SECRET&access_token=VALID_ACCESS_TOKEN")])
+            ->willReturn($this->onConsecutiveCalls($this->validUserDetails(), $this->validLongLivedToken()));
 
         app()->bind(SimpleClient::class, function () use ($mockClient) {
             return $mockClient;
