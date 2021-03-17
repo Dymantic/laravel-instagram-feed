@@ -8,7 +8,6 @@ use Dymantic\InstagramFeed\Exceptions\AccessTokenRequestException;
 use Dymantic\InstagramFeed\Exceptions\RequestTokenException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 
@@ -37,12 +36,12 @@ class Profile extends Model
     }
 
     /**
-     * @param  Request  $request
+     * @param  $request
      * @return AccessToken
      * @throws AccessTokenRequestException
      * @throws RequestTokenException
      */
-    public function requestToken(Request $request)
+    public function requestToken($request)
     {
         if ($request->has('error') || !$request->has('code')) {
             throw new RequestTokenException('Unable to get request token');
