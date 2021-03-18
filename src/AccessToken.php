@@ -12,6 +12,11 @@ class AccessToken extends Model
 
     protected $table = 'dymantic_instagram_feed_tokens';
 
+    /**
+     * @param $profile
+     * @param $token_details
+     * @return $this
+     */
     public static function createFromResponseArray($profile, $token_details)
     {
         return static::create([

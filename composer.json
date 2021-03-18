@@ -10,7 +10,15 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "^6.5 | ^7.0"
+    "php": "^7.1 | ^8.0",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6.5 | ^7.0",
+    "illuminate/config": "5.8.* | ^6.0 | ^7.0 | ^8.0",
+    "illuminate/console": "5.8.* | ^6.0 | ^7.0 | ^8.0",
+    "illuminate/database": "5.8.* | ^6.0 | ^7.0 | ^8.0",
+    "illuminate/http": "5.8.* | ^6.0 | ^7.0 | ^8.0",
+    "illuminate/mail": "5.8.* | ^6.0 | ^7.0 | ^8.0",
+    "illuminate/support": "5.8.* | ^6.0 | ^7.0 | ^8.0"
   },
   "require-dev": {
     "orchestra/testbench": "^6.0"
@@ -31,5 +39,8 @@
         "Dymantic\\InstagramFeed\\InstagramFeedServiceProvider"
       ]
     }
+  },
+  "config": {
+    "sort-packages": true
   }
 }

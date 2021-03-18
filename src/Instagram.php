@@ -6,6 +6,7 @@ namespace Dymantic\InstagramFeed;
 
 use Dymantic\InstagramFeed\Exceptions\BadTokenException;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Config;
 
 class Instagram
 {
@@ -39,6 +40,13 @@ class Instagram
         return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code&state={$profile->id}";
     }
 
+    private function redirectUriForProfile($profile_id)
+    {
+        $base = rtrim(Config::get('app.url'), '/');
+
+        return "{$base}/{$this->redirect_uri}";
+    }
+
     public function requestTokenForProfile($profile, $auth_request)
     {
         return $this->http->post(static::REQUEST_ACCESS_TOKEN_URL, [
@@ -48,13 +56,6 @@ class Instagram
             'redirect_uri' => $this->redirectUriForProfile($profile->id),
             'code' => $auth_request->get('code')
         ]);
-    }
-
-    private function redirectUriForProfile($profile_id)
-    {
-        $base = rtrim(config('app.url'), '/');
-
-        return "{$base}/{$this->redirect_uri}";
     }
 
     public function fetchUserDetails($access_token)
@@ -76,17 +77,28 @@ class Instagram
         return $this->http->get($url);
     }
 
+    /**
+     * @param  AccessToken  $token
+     * @param  int  $limit
+     * @return array
+     * @throws BadTokenException
+     */
     public function fetchMedia(AccessToken $token, $limit = 20)
     {
-        $url = sprintf(self::MEDIA_URL_FORMAT, $token->user_id, self::MEDIA_FIELDS, $this->getPageSize($limit), $token->access_code);
+        $url = sprintf(
+            self::MEDIA_URL_FORMAT,
+            $token->user_id,
+            self::MEDIA_FIELDS,
+            $this->getPageSize($limit),
+            $token->access_code
+        );
 
         $response = $this->fetchResponseData($url);
         $collection = collect($response['data'])->reject(function ($media) {
             return $this->ignoreVideo($media);
         });
-        
-        while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
 
+        while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
             $response = $this->fetchResponseData($response['paging']['next']);
             $collection = $collection->merge($response['data'])
                 ->reject(function ($media) {
@@ -96,31 +108,29 @@ class Instagram
 
         return $collection
             ->map(function ($media) {
-                return MediaParser::parseItem($media, config('instagram-feed.ignore_video', false));
+                return MediaParser::parseItem($media, Config::get('instagram-feed.ignore_video', false));
             })
             ->reject(function ($media) {
                 return is_null($media);
-            })->sortByDesc('timestamp')->take($limit ?? $collection->count())->values()->all();
+            })
+            ->sortByDesc('timestamp')
+            ->take($limit ?? $collection->count())
+            ->values()
+            ->all();
     }
 
-    public function ignoreVideo($media)
+    private function getPageSize($limit)
     {
-        if (config('instagram-feed.ignore_video', false) && ($media['media_type'] == 'VIDEO')) {
-            return $media['media_type'] == 'VIDEO';
-        }
-        return false;
-    }
-
-    private function getPageSize($limit) {
         return min($limit, 100);
     }
 
-    private function shouldFetchNextPage($previous_response, $current_count, $limit) {
-        $max = $limit ?? 1000;
-        return ($previous_response['paging']['next'] ?? false) && ($current_count <= $max);
-    }
-
-    private function fetchResponseData($url) {
+    /**
+     * @param $url
+     * @return mixed
+     * @throws BadTokenException
+     */
+    private function fetchResponseData($url)
+    {
         try {
             return $response = $this->http->get($url);
         } catch (ClientException $e) {
@@ -134,5 +144,17 @@ class Instagram
         }
     }
 
+    public function ignoreVideo($media)
+    {
+        if (Config::get('instagram-feed.ignore_video', false) && ($media['media_type'] == 'VIDEO')) {
+            return $media['media_type'] == 'VIDEO';
+        }
+        return false;
+    }
 
+    private function shouldFetchNextPage($previous_response, $current_count, $limit)
+    {
+        $max = $limit ?? 1000;
+        return ($previous_response['paging']['next'] ?? false) && ($current_count <= $max);
+    }
 }
