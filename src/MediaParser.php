@@ -59,6 +59,10 @@ class MediaParser
             ->first(function ($child) use ($ignore_video) {
                 return $child['media_type'] === 'IMAGE' || (!$ignore_video);
             });
+        
+        if (!$use) {
+            return;
+        }
 
         return [
             'type' => strtolower($use['media_type']),
