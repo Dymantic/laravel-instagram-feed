@@ -97,7 +97,7 @@ class Instagram
         $collection = collect($response['data'])->reject(function ($media) {
             return $this->ignoreVideo($media);
         });
-
+        return $response;
         while ($this->shouldFetchNextPage($response, $collection->count(), $limit)) {
             $response = $this->fetchResponseData($response['paging']['next']);
             $collection = $collection->merge($response['data'])
