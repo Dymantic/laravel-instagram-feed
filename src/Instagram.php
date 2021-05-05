@@ -42,7 +42,8 @@ class Instagram
 
     private function redirectUriForProfile($profile_id)
     {
-        $base = rtrim(Config::get('app.url'), '/');
+        $base = Config::get('instagram-feed.base_url') ?: Config::get('app.url');
+        $base = rtrim($base, '/');
 
         return "{$base}/{$this->redirect_uri}";
     }

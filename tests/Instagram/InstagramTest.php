@@ -53,6 +53,28 @@ class InstagramTest extends TestCase
     /**
      * @test
      */
+    public function profile_auth_url_uses_config_base_url_if_present()
+    {
+        $profile = Profile::create(['username' => 'test_user']);
+        config(['instagram-feed.base_url' => 'https://test-base-url.test']);
+        config(['auth_callback_route' => 'instagram']);
+
+        $full_redirect_uri = 'https://test-base-url.test/instagram';
+
+        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
+
+        $instagram = app(Instagram::class);
+
+        $uri = $instagram->authUrlForProfile($profile);
+
+        $this->assertEquals($expected, $uri);
+    }
+
+    
+
+    /**
+     * @test
+     */
     public function it_makes_a_request_for_a_token_for_a_given_profile_after_a_successful_auth_request()
     {
         $profile = Profile::create(['username' => 'test_user']);

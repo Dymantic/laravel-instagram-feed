@@ -58,6 +58,12 @@ return [
     'client_secret'       => 'YOUR INSTAGRAM CLIENT SECRET',
 
     /*
+     * The base url used to generate to auth callback route for instagram.
+     * This defaults to your APP_URL, so normally you may leave it as null
+     */
+    'base_url' => null,
+
+    /*
      * The route that will respond to the Instagram callback during the OAuth process.
      * Only enter the path without the leading slash. You need to ensure that you have registered
      * a redirect_uri for your instagram app that is equal to combining the
