@@ -7,6 +7,7 @@ namespace Dymantic\InstagramFeed;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class AccessTokenController
@@ -17,6 +18,7 @@ class AccessTokenController
         $profile = Profile::query()->find((int) $request->input('state'));
 
         if (!$profile) {
+            Log::error('unable to retrieve IG profile');
             return Redirect::to(Config::get('instagram-feed.failure_redirect_to'));
         }
 

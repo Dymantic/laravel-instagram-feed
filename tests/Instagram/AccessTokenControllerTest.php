@@ -10,6 +10,7 @@ use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\MockableDummyHttpClient;
 use Dymantic\InstagramFeed\Tests\TestCase;
+use Illuminate\Support\Facades\Log;
 
 class AccessTokenControllerTest extends TestCase
 {
@@ -83,6 +84,7 @@ class AccessTokenControllerTest extends TestCase
 
         $this->assertCount(0, AccessToken::all());
     }
+
 
     /**
      *@test

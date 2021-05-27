@@ -8,8 +8,7 @@ trait FakesInstagramCalls
 {
     private function successAuthRequest()
     {
-        return new class
-        {
+        return new class {
             public function get($reqParameter)
             {
                 if ($reqParameter === 'code') {
@@ -32,8 +31,7 @@ trait FakesInstagramCalls
 
     private function deniedAuthRequest()
     {
-        return new class
-        {
+        return new class {
             public function get($reqParameter)
             {
                 if ($reqParameter === 'error') {
@@ -48,11 +46,23 @@ trait FakesInstagramCalls
         };
     }
 
+    private function apiErrorDetails($message) {
+        return [
+            'error' => [
+                'message' => $message,
+                'type' => 'IGApiException',
+                'code' =>  100,
+                "error_subcode" => 33,
+                "fbtrace_id" => "xxx_123",
+            ]
+        ];
+    }
+
     private function validTokenDetails()
     {
         return [
             'access_token' => 'VALID_ACCESS_TOKEN',
-            'user_id'         => 'FAKE_USER_ID',
+            'user_id'      => 'FAKE_USER_ID',
         ];
     }
 
@@ -60,8 +70,8 @@ trait FakesInstagramCalls
     {
         return [
             'access_token' => 'VALID_LONG_LIVED_TOKEN',
-            'token_type' => 'bearer',
-            'expires_in' => 1234567,
+            'token_type'   => 'bearer',
+            'expires_in'   => 1234567,
         ];
     }
 
@@ -69,15 +79,15 @@ trait FakesInstagramCalls
     {
         return [
             'access_token' => 'REFRESHED_LONG_LIVED_TOKEN',
-            'token_type' => 'bearer',
-            'expires_in' => 1234567,
+            'token_type'   => 'bearer',
+            'expires_in'   => 1234567,
         ];
     }
 
     private function validUserDetails()
     {
         return [
-            'id' => 'FAKE_USER_ID',
+            'id'       => 'FAKE_USER_ID',
             'username' => 'instagram_test_username',
         ];
     }
@@ -85,10 +95,10 @@ trait FakesInstagramCalls
     private function validUserWithToken()
     {
         return [
-            'access_token' => 'VALID_LONG_LIVED_TOKEN',
-            'id' => 'FAKE_USER_ID',
-            'username' => 'instagram_test_username',
-            'name' => 'test user real name',
+            'access_token'        => 'VALID_LONG_LIVED_TOKEN',
+            'id'                  => 'FAKE_USER_ID',
+            'username'            => 'instagram_test_username',
+            'name'                => 'test user real name',
             'profile_picture_url' => 'https://test.test/test_pic.jpg',
         ];
     }
@@ -96,8 +106,8 @@ trait FakesInstagramCalls
     private function exampleMediaResponse($with_next_page = false)
     {
         return $with_next_page ?
-        json_decode(file_get_contents("./tests/basic_display_media_response_200.json"), true) :
-        json_decode(file_get_contents("./tests/basic_display_media_response_200_no_next_page.json"), true);
+            json_decode(file_get_contents("./tests/basic_display_media_response_200.json"), true) :
+            json_decode(file_get_contents("./tests/basic_display_media_response_200_no_next_page.json"), true);
     }
 
 
