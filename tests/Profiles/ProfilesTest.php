@@ -10,8 +10,10 @@ use Dymantic\InstagramFeed\Profile;
 use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 class ProfilesTest extends TestCase
@@ -77,28 +79,14 @@ class ProfilesTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('post')
-                   ->with($this->equalTo("https://api.instagram.com/oauth/access_token"), $this->equalTo([
-                       'client_id'     => 'TEST_CLIENT_ID',
-                       'client_secret' => 'TEST_CLIENT_SECRET',
-                       'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram",
-                       'code'          => 'TEST_REQUEST_CODE'
-                   ]))
-                   ->willReturn($this->validTokenDetails());
+        $user_info_url = sprintf(Instagram::GRAPH_USER_INFO_FORMAT, "FAKE_USER_ID", "VALID_ACCESS_TOKEN");
+        $exchange_token_url = sprintf(Instagram::EXCHANGE_TOKEN_FORMAT, "TEST_CLIENT_SECRET", "VALID_ACCESS_TOKEN");
+        Http::fake([
+            Instagram::REQUEST_ACCESS_TOKEN_URL => Http::response($this->validTokenDetails()),
+            $user_info_url => $this->validUserDetails(),
+            $exchange_token_url => $this->validLongLivedToken(),
 
-        $mockClient->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                [$this->equalTo("https://graph.instagram.com/FAKE_USER_ID?fields=id,username&access_token=VALID_ACCESS_TOKEN")],
-                [$this->equalTo("https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=TEST_CLIENT_SECRET&access_token=VALID_ACCESS_TOKEN")])
-            ->willReturn($this->onConsecutiveCalls($this->validUserDetails(), $this->validLongLivedToken()));
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        ]);
 
         $profile->requestToken($this->successAuthRequest());
 
@@ -125,15 +113,10 @@ class ProfilesTest extends TestCase
             'user_profile_picture' => 'https://test.test/test_pic.jpg',
         ]);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with($this->equalTo("https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=VALID_LONG_LIVED_TOKEN"))
-                   ->willReturn($this->refreshedLongLivedToken());
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        $refresh_url = sprintf(Instagram::REFRESH_TOKEN_FORMAT, "VALID_LONG_LIVED_TOKEN");
+        Http::fake([
+            $refresh_url => Http::response($this->refreshedLongLivedToken()),
+        ]);
 
         $profile->refreshToken();
 
@@ -155,13 +138,7 @@ class ProfilesTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->never())
-                   ->method('post');
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake();
 
         try {
             $profile->requestToken($this->deniedAuthRequest());
@@ -170,6 +147,8 @@ class ProfilesTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(RequestTokenException::class, $e);
         }
+
+        Http::assertNothingSent();
     }
 
     /**
@@ -180,21 +159,11 @@ class ProfilesTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('post')
-                   ->with($this->equalTo("https://api.instagram.com/oauth/access_token"), $this->equalTo([
-                       'client_id'     => 'TEST_CLIENT_ID',
-                       'client_secret' => 'TEST_CLIENT_SECRET',
-                       'grant_type'    => 'authorization_code',
-                       'redirect_uri'  => "http://test.test/instagram",
-                       'code'          => 'TEST_REQUEST_CODE'
-                   ]))
-                   ->willThrowException(new \Exception());
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            Instagram::REQUEST_ACCESS_TOKEN_URL => Http::response([
+                'error' => ['message' => 'test']
+            ], 400),
+        ]);
 
         try {
             $profile->requestToken($this->successAuthRequest());
@@ -238,17 +207,13 @@ class ProfilesTest extends TestCase
         $profile = Profile::create(['username' => 'test_user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $mockCLient = $this->createMock(SimpleClient::class);
-        $mockCLient->expects($this->once())
-                   ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token, 33)))
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
-            return $mockCLient;
-        });
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse()),
+        ]);
 
         $feed = $profile->feed($limit = 33);
+
+        Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token, 33));
 
         $this->assertCount(4, $feed);
     }
@@ -263,17 +228,13 @@ class ProfilesTest extends TestCase
         $profile = Profile::create(['username' => 'test_user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $mockCLient = $this->createMock(SimpleClient::class);
-        $mockCLient->expects($this->once())
-                   ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token)))
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
-            return $mockCLient;
-        });
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse()),
+        ]);
 
         $feed = $profile->feed();
+
+        Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
         $this->assertInstanceOf(Collection::class, $feed);
     }
@@ -296,18 +257,14 @@ class ProfilesTest extends TestCase
         $profile = Profile::create(['username' => 'test_user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $mockCLient = $this->createMock(SimpleClient::class);
-        $mockCLient->expects($this->once())
-                   ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token)))
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function () use ($mockCLient) {
-            return $mockCLient;
-        });
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse()),
+        ]);
 
         $feed = $profile->feed();
         $this->assertCount(4, $feed);
+
+        Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
         $this->assertTrue(cache()->has($profile->cacheKey()));
         $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
@@ -331,17 +288,15 @@ class ProfilesTest extends TestCase
 
         cache()->put($profile->cacheKey(), $old_feed, 1000);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with($this->equalTo($this->makeMediaUrl($token, 44)))
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse()),
+        ]);
 
         $feed = $profile->refreshFeed($limit = 44);
+
+        Http::assertSent(
+            fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token, 44)
+        );
         $this->assertCount(4, $feed);
         $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
     }
@@ -370,15 +325,9 @@ class ProfilesTest extends TestCase
         $profile = Profile::create(['username' => 'test_user']);
         AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with($this->anything())
-                   ->willThrowException(new \Exception());
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response(['error' => ['message' => 'bad']], 400),
+        ]);
 
         $feed = $profile->feed();
         $this->assertEquals([], $feed->all());
@@ -389,22 +338,16 @@ class ProfilesTest extends TestCase
      */
     public function the_refresh_feed_method_will_not_overwrite_cache_with_failed_response()
     {
-        $this->disableExceptionHandling();
+        $this->withoutExceptionHandling();
 
         $profile = Profile::create(['username' => 'test_user']);
         AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
         cache()->forever($profile->cacheKey(), ['test' => 'test value']);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with($this->anything())
-                   ->willThrowException(new \Exception());
-
-        app()->bind(SimpleClient::class, function () use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response(['error' => ['message' => 'bad']], 400),
+        ]);
 
         try {
             $profile->refreshFeed();

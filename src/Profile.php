@@ -45,8 +45,6 @@ class Profile extends Model
     public function requestToken($request)
     {
         if ($request->has('error') || !$request->has('code')) {
-            $message = $this->getRequestErrorMessage($request);
-            Log::error(sprintf("Instagram auth error: %s", $message));
             throw new RequestTokenException('Unable to get request token');
         }
 
@@ -57,31 +55,12 @@ class Profile extends Model
             $user_details = $instagram->fetchUserDetails($token_details);
             $token = $instagram->exchangeToken($token_details);
         } catch (Exception $e) {
-            $message = $this->getRequestErrorMessage($request);
-            Log::error(sprintf("Instagram auth error: %s", $message));
             throw new AccessTokenRequestException($e->getMessage());
         }
 
         return $this->setToken(array_merge(['access_token' => $token['access_token']], $user_details));
     }
 
-    private function getRequestErrorMessage($request)
-    {
-        if(!$request->has('error')) {
-            return 'unknown error message';
-        }
-
-        $error = $request->get('error');
-
-        if(is_string($error)) {
-            return $error;
-        }
-
-        if(is_array($error) && array_key_exists('message', $error)) {
-            return $error['message'];
-        }
-        return 'unknown error message';
-    }
 
     public function refreshToken()
     {

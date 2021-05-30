@@ -19,22 +19,7 @@ abstract class TestCase extends Orchestra
 
     }
 
-    protected function disableExceptionHandling()
-    {
-        $this->app->instance(ExceptionHandler::class, new class extends Handler {
-            public function __construct() {}
 
-            public function report(\Throwable $e)
-            {
-                // no-op
-            }
-
-            public function render($request, \Throwable $e) {
-                throw $e;
-            }
-
-        });
-    }
 
     /**
      * @param \Illuminate\Foundation\Application $app

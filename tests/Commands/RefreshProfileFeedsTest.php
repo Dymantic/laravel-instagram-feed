@@ -10,7 +10,9 @@ use Dymantic\InstagramFeed\Profile;
 use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\TestCase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 class RefreshProfileFeedsTest extends TestCase
@@ -26,22 +28,14 @@ class RefreshProfileFeedsTest extends TestCase
         $profileB = Profile::create(['username' => 'test user two']);
         $tokenB = AccessToken::createFromResponseArray($profileB, $this->validUserWithToken());
 
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse(), 200),
+        ]);
+
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-        $this->app['config']->set('instagram-feed.notify_on_error', true);
-
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->exactly(2))
-                   ->method('get')
-                   ->withConsecutive(
-                       [$this->equalTo($this->makeMediaUrl($tokenA))],
-                       [$this->equalTo($this->makeMediaUrl($tokenB))])
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function() use ($mockClient) {
-            return $mockClient;
-        });
+        $this->app['config']->set('instagram-feed.notify_on_error', null);
 
         Artisan::call('instagram-feed:refresh');
 
@@ -62,19 +56,11 @@ class RefreshProfileFeedsTest extends TestCase
         $this->app['config']->set('instagram-feed.client_id', 'TEST_CLIENT_ID');
         $this->app['config']->set('instagram-feed.client_secret', 'TEST_CLIENT_SECRET');
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
-        $this->app['config']->set('instagram-feed.notify_on_error', true);
+        $this->app['config']->set('instagram-feed.notify_on_error', null);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with(
-                       $this->equalTo($this->makeMediaUrl($token))
-                   )
-                   ->willReturn($this->exampleMediaResponse());
-
-        $this->app->bind(SimpleClient::class, function() use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response($this->exampleMediaResponse(), 200),
+        ]);
 
         Artisan::call('instagram-feed:refresh');
 
@@ -97,17 +83,9 @@ class RefreshProfileFeedsTest extends TestCase
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
         $this->app['config']->set('instagram-feed.notify_on_error', 'test@test.con');
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with(
-                       $this->equalTo($this->makeMediaUrl($token))
-                   )
-                   ->willThrowException(new \Exception(''));
-
-        $this->app->bind(SimpleClient::class, function() use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response(['error' => ['message' => 'bad request test']], 500),
+        ]);
 
         Artisan::call('instagram-feed:refresh');
 
@@ -133,17 +111,9 @@ class RefreshProfileFeedsTest extends TestCase
         $this->app['config']->set('instagram-feed.auth_callback_route', 'instagram');
         $this->app['config']->set('instagram-feed.notify_on_error', 'test@test.con');
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->once())
-                   ->method('get')
-                   ->with(
-                       $this->equalTo($this->makeMediaUrl($token))
-                   )
-                   ->willThrowException(new BadTokenException(''));
-
-        $this->app->bind(SimpleClient::class, function() use ($mockClient) {
-            return $mockClient;
-        });
+        Http::fake([
+            '*' => Http::response(['meta' => ['error_type' => 'OAuthAccessTokenException']], 400),
+        ]);
 
         Artisan::call('instagram-feed:refresh');
 
