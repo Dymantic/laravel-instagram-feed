@@ -22,15 +22,12 @@ class Instagram
     private $client_id;
     private $client_secret;
     private $redirect_uri;
-    private $http;
 
-    public function __construct($config, $client)
+    public function __construct($config)
     {
         $this->client_id = $config["client_id"];
         $this->client_secret = $config["client_secret"];
         $this->redirect_uri = $config["auth_callback_route"];
-
-        $this->http = $client;
     }
 
     public function authUrlForProfile($profile)

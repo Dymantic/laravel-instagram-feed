@@ -68,12 +68,8 @@ class InstagramFeedServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->bind(Instagram::class, function ($app) {
-            return new Instagram(Config::get('instagram-feed'), $app->make(SimpleClient::class));
-        });
-
-        $this->app->bind(SimpleClient::class, function ($app) {
-            return new SimpleClient(new Client());
+        $this->app->bind(Instagram::class, function () {
+            return new Instagram(Config::get('instagram-feed'));
         });
     }
 }
