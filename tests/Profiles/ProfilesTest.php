@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ProfilesTest extends TestCase
 {
@@ -65,11 +66,11 @@ class ProfilesTest extends TestCase
     {
         $profile = Profile::create(['username' => 'test_user']);
         $app_url = rtrim(config('app.url'), '/');
-        $full_redirect_uri = "{$app_url}/instagram";
+        $full_redirect_uri = "{$app_url}/instagram"; //http://test.test/instagram
 
-        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
+        $expected = '/https:\/\/api.instagram.com\/oauth\/authorize\/\?client_id=TEST_CLIENT_ID\&redirect_uri=http:\/\/test.test\/instagram\&scope=user_profile,user_media\&response_type=code\&state=[a-zA-Z0-9]{16}/';
 
-        $this->assertEquals($expected, $profile->getInstagramAuthUrl());
+        $this->assertMatchesRegularExpression($expected, $profile->getInstagramAuthUrl());
     }
 
     /**
@@ -358,25 +359,7 @@ class ProfilesTest extends TestCase
 
     }
 
-    /**
-     * @test
-     */
-    public function a_profile_can_present_its_view_data()
-    {
-        $profile = Profile::create(['username' => 'test user']);
-        AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
-
-        $expected = [
-            'name'     => 'test user',
-            'username' => 'instagram_test_username',
-            'fullname' => 'not available',
-            'avatar'   => 'not available',
-            'has_auth' => true,
-            'get_auth_url' => $profile->getInstagramAuthUrl()
-        ];
-
-        $this->assertEquals($expected, $profile->viewData());
-    }
+    
 
     private function makeMediaUrl($token, $limit = 20)
     {

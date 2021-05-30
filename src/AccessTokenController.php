@@ -14,7 +14,7 @@ class AccessTokenController
 {
     public function handleRedirect(Request $request)
     {
-        $profile = Profile::find((int) $request->input('state'));
+        $profile = Profile::usingIdentityToken($request->input('state', ''));
 
 
         if (!$profile) {

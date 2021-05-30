@@ -60,19 +60,6 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        $app['db']->connection()->getSchemaBuilder()->create('test_users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('email');
-            $table->string('password');
-            $table->timestamps();
-        });
-
-        $app['db']->connection()->getSchemaBuilder()->create('nameless_authors', function (Blueprint $table) {
-            $table->increments('id');
-        });
-
-        TestUser::create(['name' => 'test user', 'email' => 'test@example.com', 'password' => 'password']);
 
         include_once __DIR__ . '/../database/migrations/create_instagram_feed_token_table.php.stub';
         include_once __DIR__ . '/../database/migrations/create_instagram_basic_profile_table.php.stub';

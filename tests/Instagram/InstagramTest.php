@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class InstagramTest extends TestCase
 {
@@ -40,10 +41,11 @@ class InstagramTest extends TestCase
     public function it_can_provide_a_auth_url_for_a_given_profile()
     {
         $profile = Profile::create(['username' => 'test_user']);
+        $profile_identifier = Str::after($profile->getInstagramAuthUrl(), '&state=');
 
         $full_redirect_uri = 'http://test.test/instagram';
 
-        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
+        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile_identifier}";
 
         $instagram = app(Instagram::class);
 
@@ -58,12 +60,13 @@ class InstagramTest extends TestCase
     public function profile_auth_url_uses_config_base_url_if_present()
     {
         $profile = Profile::create(['username' => 'test_user']);
+        $profile_identifier = Str::after($profile->getInstagramAuthUrl(), '&state=');
         config(['instagram-feed.base_url' => 'https://test-base-url.test']);
         config(['auth_callback_route' => 'instagram']);
 
         $full_redirect_uri = 'https://test-base-url.test/instagram';
 
-        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile->id}";
+        $expected = "https://api.instagram.com/oauth/authorize/?client_id=TEST_CLIENT_ID&redirect_uri=$full_redirect_uri&scope=user_profile,user_media&response_type=code&state={$profile_identifier}";
 
         $instagram = app(Instagram::class);
 

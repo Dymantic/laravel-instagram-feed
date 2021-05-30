@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Profile extends Model
 {
@@ -24,9 +25,22 @@ class Profile extends Model
         return static::CACHE_KEY_BASE . ":" . $this->id;
     }
 
+    public static function usingIdentityToken(string $token): ?self
+    {
+        return tap(static::where('identity_token', $token)->first(), function($profile) {
+            if($profile) {
+                $profile->identity_token = null;
+                $profile->save();
+            }
+        });
+    }
+
     public function getInstagramAuthUrl()
     {
         $instagram = App::make(Instagram::class);
+
+        $this->identity_token = Str::random(16);
+        $this->save();
 
         return $instagram->authUrlForProfile($this);
     }

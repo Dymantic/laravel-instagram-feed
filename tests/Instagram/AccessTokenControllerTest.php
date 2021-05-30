@@ -14,6 +14,7 @@ use Dymantic\InstagramFeed\Tests\TestCase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AccessTokenControllerTest extends TestCase
 {
@@ -46,14 +47,17 @@ class AccessTokenControllerTest extends TestCase
         });
 
         $profile = Profile::create(['username' => 'test_user']);
+        $profile_identifier = $this->getProfileIdentifier($profile);
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_TOKEN&state={$profile->id}";
+
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_TOKEN&state={$profile_identifier}";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect('success');
 
         $this->assertTrue($profile->fresh()->hasInstagramAccess());
         $this->assertCount(1, AccessToken::all());
+        $this->assertNull($profile->fresh()->identity_token);
     }
 
     /**
@@ -67,7 +71,7 @@ class AccessTokenControllerTest extends TestCase
         Http::fake();
         Log::shouldReceive('error')->once()->with('unable to retrieve IG profile');
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?profile=FAKE&code=TEST_REQUEST_TOKEN";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?&code=TEST_REQUEST_TOKEN&state=BAD_TOKEN";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect('failed_auth');
@@ -91,8 +95,9 @@ class AccessTokenControllerTest extends TestCase
         Log::shouldReceive('error')->once()->with('Unable to get request token');
 
         $profile = Profile::create(['username' => 'test_user']);
+        $profile_identifier = $this->getProfileIdentifier($profile);
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?state={$profile->id}&error=access_denied";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?state={$profile_identifier}&error=access_denied";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect(config('instagram-feed.failed_auth'));
@@ -111,6 +116,7 @@ class AccessTokenControllerTest extends TestCase
         $this->app['config']->set('instagram-feed.failure_redirect_to', 'failed_auth');
 
         $profile = Profile::create(['username' => 'test_user']);
+        $profile_identifier = $this->getProfileIdentifier($profile);
 
         Http::fake([
             Instagram::REQUEST_ACCESS_TOKEN_URL => Http::response([
@@ -124,7 +130,7 @@ class AccessTokenControllerTest extends TestCase
         );
         Log::shouldReceive('error')->once()->with($expected_error);
 
-        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_CODE&state={$profile->id}";
+        $redirect_url = config('instagram-feed.auth_callback_route') . "?code=TEST_REQUEST_CODE&state={$profile_identifier}";
 
         $response = $this->get($redirect_url);
         $response->assertRedirect(config('instagram-feed.failure_redirect_to'));
@@ -132,6 +138,11 @@ class AccessTokenControllerTest extends TestCase
         Http::assertSent(fn (Request $request) => $request->url() == Instagram::REQUEST_ACCESS_TOKEN_URL);
 
         $this->assertCount(0, AccessToken::all());
+    }
+
+    private function getProfileIdentifier($profile)
+    {
+        return Str::after($profile->getInstagramAuthUrl(), '&state=');
     }
 
 
