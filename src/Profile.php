@@ -25,6 +25,11 @@ class Profile extends Model
         return static::CACHE_KEY_BASE . ":" . $this->id;
     }
 
+    public static function for(string $username): ?self
+    {
+        return static::where('username', $username)->first();
+    }
+
     public static function usingIdentityToken(string $token): ?self
     {
         return tap(static::where('identity_token', $token)->first(), function($profile) {

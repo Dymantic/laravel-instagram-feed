@@ -60,6 +60,20 @@ class ProfilesTest extends TestCase
     }
 
     /**
+     *@test
+     */
+    public function can_fetch_a_profile_for_a_given_username()
+    {
+        $profile = Profile::create(['username' => 'test_user']);
+
+        $fetched = Profile::for('test_user');
+        $non_existent = Profile::for('non_existent_username');
+
+        $this->assertTrue($fetched->is($profile));
+        $this->assertNull($non_existent);
+    }
+
+    /**
      * @test
      */
     public function a_profile_can_generate_the_correct_auth_init_url()
