@@ -39,8 +39,10 @@ class Profile extends Model
     {
         $instagram = App::make(Instagram::class);
 
-        $this->identity_token = Str::random(16);
-        $this->save();
+        if(!$this->identity_token) {
+            $this->identity_token = Str::random(16);
+            $this->save();
+        }
 
         return $instagram->authUrlForProfile($this);
     }

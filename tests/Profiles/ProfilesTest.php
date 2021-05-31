@@ -359,7 +359,7 @@ class ProfilesTest extends TestCase
 
     }
 
-    
+
 
     private function makeMediaUrl($token, $limit = 20)
     {
