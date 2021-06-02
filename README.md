@@ -130,6 +130,7 @@ The feed will be a Laravel collection of items that have the following structure
 [
     'type' => 'image' // can be either image or video
     'url' => 'source url for media',
+    'thumbnail_url' => 'thumbnail url is for video only, image will be the same as url'
     'id' => 'the media id',
     'caption' => 'the media caption',
     'permalink' => 'the permalink for accessing the post',

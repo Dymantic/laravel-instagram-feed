@@ -77,5 +77,5 @@ class MediaParser
         ];
     }
 
-    
+
 }
