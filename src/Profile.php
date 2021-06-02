@@ -8,6 +8,7 @@ use Dymantic\InstagramFeed\Exceptions\AccessTokenRequestException;
 use Dymantic\InstagramFeed\Exceptions\RequestTokenException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +41,7 @@ class Profile extends Model
         });
     }
 
-    public function getInstagramAuthUrl()
+    public function getInstagramAuthUrl(): string
     {
         $instagram = App::make(Instagram::class);
 
@@ -91,10 +92,7 @@ class Profile extends Model
         $this->latestToken()->update(['access_code' => $new_token['access_token']]);
     }
 
-    /**
-     * @param $token_details
-     * @return AccessToken
-     */
+
     protected function setToken($token_details)
     {
         $this->tokens->each->delete();
@@ -102,12 +100,12 @@ class Profile extends Model
         return AccessToken::createFromResponseArray($this, $token_details);
     }
 
-    public function hasInstagramAccess()
+    public function hasInstagramAccess(): bool
     {
         return !! $this->latestToken();
     }
 
-    public function latestToken()
+    public function latestToken(): ?AccessToken
     {
         return $this->tokens()->latest()->first();
     }
@@ -122,7 +120,7 @@ class Profile extends Model
         $this->tokens->each->delete();
     }
 
-    public function feed($limit = 20)
+    public function feed($limit = 20): Collection
     {
         if(!$this->latestToken()) {
             return collect([]);
@@ -143,7 +141,7 @@ class Profile extends Model
         }
     }
 
-    public function refreshFeed($limit = 20)
+    public function refreshFeed($limit = 20): Collection
     {
         $instagram = App::make(Instagram::class);
         $new_feed = $instagram->fetchMedia($this->latestToken(), $limit);
@@ -154,7 +152,7 @@ class Profile extends Model
         return $this->feed();
     }
 
-    public function viewData()
+    public function viewData(): array
     {
         $token = $this->tokens->first();
         return [
