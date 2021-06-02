@@ -77,31 +77,5 @@ class MediaParser
         ];
     }
 
-    private static function firstCarouselItem($media, $ignore_video)
-    {
-        return collect($media['carousel_media'])
-            ->first(function ($item) use ($ignore_video) {
-                return !$ignore_video || ($item["images"] ?? false);
-            });
-    }
-
-    private static function extractVideo($media)
-    {
-        return [
-            'type' => 'video',
-            'low' => $media['low_bandwidth']['url'] ?? null,
-            'thumb' => $media['low_resolution']['url'] ?? null,
-            'standard' => $media['standard_resolution']['url'] ?? null,
-        ];
-    }
-
-    private static function extractImage($media)
-    {
-        return [
-            'type' => 'image',
-            'low' => $media['low_resolution']['url'] ?? null,
-            'thumb' => $media['thumbnail']['url'] ?? null,
-            'standard' => $media['standard_resolution']['url'] ?? null,
-        ];
-    }
+    
 }
