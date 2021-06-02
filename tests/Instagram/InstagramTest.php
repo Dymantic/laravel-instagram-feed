@@ -194,6 +194,7 @@ class InstagramTest extends TestCase
                 'id' => '17853951361863258',
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
+                'thumbnail_url' => '',
             ],
             [
                 'type' => 'image',
@@ -202,6 +203,7 @@ class InstagramTest extends TestCase
                 'caption' => "test caption two",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
+                'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
             ],
             [
                 'type' => 'video',
@@ -210,6 +212,7 @@ class InstagramTest extends TestCase
                 'caption' => "test caption three",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
+                'thumbnail_url' => '',
             ],
             [
                 'type' => 'video',
@@ -218,6 +221,7 @@ class InstagramTest extends TestCase
                 'caption' => "test caption four",
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
+                'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/79129220_127781772008163_6289896098224492554_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=ViJh35MyvBwAX-j7zq5&_nc_ht=scontent.xx&oh=759ed307d3f575f6cd59ea2ce59529bd&oe=5E91EFA1',
             ]
         ];
 
@@ -291,6 +295,7 @@ class InstagramTest extends TestCase
                 'permalink' => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'id' => '17853951361863258',
                 'timestamp' => '',
+                'thumbnail_url' => '',
             ],
             [
                 'type' => 'image',
@@ -299,6 +304,7 @@ class InstagramTest extends TestCase
                 "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'caption' => "test caption two",
                 'timestamp' => '',
+                'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
             ],
             [
                 'type' => 'image',
@@ -307,6 +313,7 @@ class InstagramTest extends TestCase
                 "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
                 'caption' => "test caption three",
                 'timestamp' => '',
+                'thumbnail_url' => '',
             ],
         ];
 
