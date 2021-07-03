@@ -9,6 +9,8 @@ class MediaParser
     public static function parseItem($media, $ignore_video = false)
     {
 
+        echo 'parse';
+
         dump($media);
 
         $type = $media['media_type'];
