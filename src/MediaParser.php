@@ -8,6 +8,9 @@ class MediaParser
 {
     public static function parseItem($media, $ignore_video = false)
     {
+
+        dump($media);
+
         $type = $media['media_type'];
 
         switch ($type) {
@@ -57,6 +60,7 @@ class MediaParser
 
     private static function parseAsCarousel($media, $ignore_video)
     {
+
         $use = collect($media['children']['data'])
             ->first(function ($child) use ($ignore_video) {
                 return $child['media_type'] === 'IMAGE' || (!$ignore_video);
