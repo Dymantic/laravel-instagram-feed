@@ -195,6 +195,59 @@ class InstagramTest extends TestCase
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
                 'thumbnail_url' => '',
+                'is_carousel' => true,
+                'children' => [
+                    [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F",
+                        "id" => "17849438098899018"
+                    ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/84381272_1984995381635899_5263984109196147819_n.jpg?_nc_cat=109&_nc_sid=8ae9d6&_nc_ohc=_GH0NffaIucAX9WWveS&_nc_ht=scontent.xx&oh=0871f5013d7eff3336a8f90cc320a6d6&oe=5E921910",
+                        "id" => "18132118615037332"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88164910_2338159439809338_6922195276317801534_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=UasVMdUTi0AAX-mb4IW&_nc_ht=scontent.xx&oh=4ab1132eac9766086fd268b9a80a6410&oe=5E930DAF",
+                        "id" => "17894008966462830"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/89117981_2510959432554564_8299423274477931900_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=6Aodzlz0DI8AX9l8fnl&_nc_ht=scontent.xx&oh=76729707ca2daba3dddc4ca15146114f&oe=5E930DF7",
+                        "id" => "17879363497541148"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/82386550_2551961055084313_287099188903912380_n.jpg?_nc_cat=100&_nc_sid=8ae9d6&_nc_ohc=9ef-YjDeuaUAX9oAc-H&_nc_ht=scontent.xx&oh=437644b122ccaa78fe7dc95de72871c7&oe=5E91CD95",
+                        "id" => "17852313715894892"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/87695409_507583723499465_4522591678214389436_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=RRmJ0hA-8osAX9Y8kyy&_nc_ht=scontent.xx&oh=09dfd22f9e96fd61d6630ac3de6f413d&oe=5E90BED7",
+                        "id" => "17859657748756529"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88213032_2785656941528471_2783562451851138997_n.jpg?_nc_cat=105&_nc_sid=8ae9d6&_nc_ohc=5zHF0n4CH3kAX-WogX_&_nc_ht=scontent.xx&oh=8d4eb96ed7e60877a99e11c7bd8f98ff&oe=5E929B6B",
+                        "id" => "18085866604160687"
+                      ],
+                      [
+                        "type" => "video",
+                        "url" => "https://video.xx.fbcdn.net/v/t50.31694-16/87980268_1553347528164878_8967566556928578472_n.mp4?_nc_cat=109&_nc_sid=8ae9d6&_nc_ohc=st4e4abCi0sAX-T37fs&_nc_ht=video.xx&oh=da7fe6fb1546189ce4ff0420af168c81&oe=5E9068D1",
+                        "id" => "17858673856780100"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/89060452_204421423969595_9028329592920102436_n.jpg?_nc_cat=111&_nc_sid=8ae9d6&_nc_ohc=wNX4e6_6PkIAX96Xzta&_nc_ht=scontent.xx&oh=3efb5bbf73bd4c151b14f22a8f724f85&oe=5E9068A8",
+                        "id" => "18089802349183081"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/87854876_499080161046701_3462268559168413828_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=gp5kIS3kiJ8AX_lajeg&_nc_ht=scontent.xx&oh=1c90e7f4fa5f2c82e880dbd3fab1202f&oe=5E92FF1F",
+                        "id" => "17906447419421821"
+                      ]
+                ]
             ],
             [
                 'type' => 'image',
@@ -204,6 +257,8 @@ class InstagramTest extends TestCase
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
                 'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
+                'is_carousel' => false,
+                'children' => []
             ],
             [
                 'type' => 'video',
@@ -213,6 +268,34 @@ class InstagramTest extends TestCase
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
                 'thumbnail_url' => '',
+                'is_carousel' => true,
+                'children' => [
+                    [
+                        "type" => "video",
+                        "url" => "https://video.xx.fbcdn.net/v/t50.2886-16/80075364_501004160505270_3520263354313331489_n.mp4?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=fXXNJuZcyXEAX8rD8l8&_nc_ht=video.xx&oh=e1cbd15a0f23db1f7d5a5f6ddd2ace83&oe=5E9400C7",
+                        "id" => "17846480635805285"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790",
+                        "id" => "18049771285205991"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/75397694_3051536841540773_7421191993117550003_n.jpg?_nc_cat=101&_nc_sid=8ae9d6&_nc_ohc=6VcQl7GL0V4AX90J_Sz&_nc_ht=scontent.xx&oh=ec8753a6bb908e6df2f9033eddf7845d&oe=5E914860",
+                        "id" => "17854146172710573"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/76881970_125876788524569_9194242390680601811_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=DbLu1RYIY28AX_Y_NZS&_nc_ht=scontent.xx&oh=4a9e736b9c4d04e33255238705b3daae&oe=5E91A61C",
+                        "id" => "18120976165009091"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/79806151_2512679375668563_7275185319939303133_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=qGj9efDO_yMAX9r-nFK&_nc_ht=scontent.xx&oh=d62aebba7c3a698ed9060a73a54334c7&oe=5E914E87",
+                        "id" => "18107139619074168"
+                      ]
+                ]
             ],
             [
                 'type' => 'video',
@@ -222,6 +305,8 @@ class InstagramTest extends TestCase
                 'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
                 'timestamp' => '',
                 'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/79129220_127781772008163_6289896098224492554_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=ViJh35MyvBwAX-j7zq5&_nc_ht=scontent.xx&oh=759ed307d3f575f6cd59ea2ce59529bd&oe=5E91EFA1',
+                'is_carousel' => false,
+                'children' => []
             ]
         ];
 
@@ -296,6 +381,54 @@ class InstagramTest extends TestCase
                 'id' => '17853951361863258',
                 'timestamp' => '',
                 'thumbnail_url' => '',
+                'is_carousel' => true,
+                'children' => [
+                    [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F",
+                        "id" => "17849438098899018"
+                    ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/84381272_1984995381635899_5263984109196147819_n.jpg?_nc_cat=109&_nc_sid=8ae9d6&_nc_ohc=_GH0NffaIucAX9WWveS&_nc_ht=scontent.xx&oh=0871f5013d7eff3336a8f90cc320a6d6&oe=5E921910",
+                        "id" => "18132118615037332"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88164910_2338159439809338_6922195276317801534_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=UasVMdUTi0AAX-mb4IW&_nc_ht=scontent.xx&oh=4ab1132eac9766086fd268b9a80a6410&oe=5E930DAF",
+                        "id" => "17894008966462830"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/89117981_2510959432554564_8299423274477931900_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=6Aodzlz0DI8AX9l8fnl&_nc_ht=scontent.xx&oh=76729707ca2daba3dddc4ca15146114f&oe=5E930DF7",
+                        "id" => "17879363497541148"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/82386550_2551961055084313_287099188903912380_n.jpg?_nc_cat=100&_nc_sid=8ae9d6&_nc_ohc=9ef-YjDeuaUAX9oAc-H&_nc_ht=scontent.xx&oh=437644b122ccaa78fe7dc95de72871c7&oe=5E91CD95",
+                        "id" => "17852313715894892"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/87695409_507583723499465_4522591678214389436_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=RRmJ0hA-8osAX9Y8kyy&_nc_ht=scontent.xx&oh=09dfd22f9e96fd61d6630ac3de6f413d&oe=5E90BED7",
+                        "id" => "17859657748756529"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/88213032_2785656941528471_2783562451851138997_n.jpg?_nc_cat=105&_nc_sid=8ae9d6&_nc_ohc=5zHF0n4CH3kAX-WogX_&_nc_ht=scontent.xx&oh=8d4eb96ed7e60877a99e11c7bd8f98ff&oe=5E929B6B",
+                        "id" => "18085866604160687"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/89060452_204421423969595_9028329592920102436_n.jpg?_nc_cat=111&_nc_sid=8ae9d6&_nc_ohc=wNX4e6_6PkIAX96Xzta&_nc_ht=scontent.xx&oh=3efb5bbf73bd4c151b14f22a8f724f85&oe=5E9068A8",
+                        "id" => "18089802349183081"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/87854876_499080161046701_3462268559168413828_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=gp5kIS3kiJ8AX_lajeg&_nc_ht=scontent.xx&oh=1c90e7f4fa5f2c82e880dbd3fab1202f&oe=5E92FF1F",
+                        "id" => "17906447419421821"
+                      ]
+                ]
             ],
             [
                 'type' => 'image',
@@ -305,6 +438,8 @@ class InstagramTest extends TestCase
                 'caption' => "test caption two",
                 'timestamp' => '',
                 'thumbnail_url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
+                'is_carousel' => false,
+                'children' => [],
             ],
             [
                 'type' => 'image',
@@ -314,6 +449,29 @@ class InstagramTest extends TestCase
                 'caption' => "test caption three",
                 'timestamp' => '',
                 'thumbnail_url' => '',
+                'is_carousel' => true,
+                'children' => [
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790",
+                        "id" => "18049771285205991"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/75397694_3051536841540773_7421191993117550003_n.jpg?_nc_cat=101&_nc_sid=8ae9d6&_nc_ohc=6VcQl7GL0V4AX90J_Sz&_nc_ht=scontent.xx&oh=ec8753a6bb908e6df2f9033eddf7845d&oe=5E914860",
+                        "id" => "17854146172710573"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/76881970_125876788524569_9194242390680601811_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=DbLu1RYIY28AX_Y_NZS&_nc_ht=scontent.xx&oh=4a9e736b9c4d04e33255238705b3daae&oe=5E91A61C",
+                        "id" => "18120976165009091"
+                      ],
+                      [
+                        "type" => "image",
+                        "url" => "https://scontent.xx.fbcdn.net/v/t51.2885-15/79806151_2512679375668563_7275185319939303133_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=qGj9efDO_yMAX9r-nFK&_nc_ht=scontent.xx&oh=d62aebba7c3a698ed9060a73a54334c7&oe=5E914E87",
+                        "id" => "18107139619074168"
+                      ]
+                ]
             ],
         ];
 

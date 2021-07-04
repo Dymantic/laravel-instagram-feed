@@ -36,7 +36,8 @@ class MediaParser
             'permalink' => $media['permalink'],
             'thumbnail_url' => $media['media_url'],
             'timestamp' => $media['timestamp'] ?? '',
-            'is_carousel' => false
+            'is_carousel' => false,
+            'children' => [],
         ];
     }
 
@@ -54,7 +55,9 @@ class MediaParser
             'permalink' => $media['permalink'],
             'thumbnail_url' => $media['thumbnail_url'] ?? '',
             'timestamp' => $media['timestamp'] ?? '',
-            'is_carousel' => false
+            'is_carousel' => false,
+            'children' => [],
+
         ];
     }
 
@@ -81,7 +84,13 @@ class MediaParser
             'thumbnail_url' => $use['thumbnail_url'] ?? '',
             'timestamp' => $media['timestamp'] ?? '',
             'is_carousel' => $children->count() > 0,
-            'children' => $children
+            'children' => $children->map(function ($child) {
+                return [
+                   'type' => strtolower($child['media_type']),
+                   'url' => $child['media_url'],
+                   'id' => $child['id'],         
+                ];
+            })->values()->all(),
         ];
     }
 
