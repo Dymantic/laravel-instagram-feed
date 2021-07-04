@@ -26,7 +26,7 @@ To use the Instagram Basic Display API, you will need to have a Facebook app set
 
 ### How Instagram Media is Handled
 
-Instagram provides three media types through this API: image, video and carousel. This package simplifies that into just a feed of images and videos. You may use the `ignore_video` config option if you don't want to include any videos. For carousel items, the first item of the carousel is used. If video is to be ignored, and the first image will be used, if it exists.
+Instagram provides three media types through this API: image, video and carousel. This package simplifies that into just a feed of images and videos. You may use the `ignore_video` config option if you don't want to include any videos. For carousel items, the first item of the carousel is used. If video is to be ignored, and the first image will be used, if it exists. From version 2.5 and up you may access the carousel children via the children property of each media item in your feed.
 
 ##### Note on ignoring video
 
@@ -126,6 +126,8 @@ Remember that if you chose to ignore video, your feed size may be smaller than t
 
 The feed will be a Laravel collection of items that have the following structure:
 
+Note on `type`: This package was intended just to display a simple feed of recent posts, and so Carousel Albums were simplified in either `image` or `video` types. Since v2.5, the Carousel Album media children will be included in the feed, but the main type will still be `image` or `video`, so that there is no change for people already using this package. For those who want to use the Carousel Album children, you may check `is_carousel`, and find the children in `children`.
+
 ```
 [
     'type' => 'image' // can be either image or video
@@ -135,6 +137,8 @@ The feed will be a Laravel collection of items that have the following structure
     'caption' => 'the media caption',
     'permalink' => 'the permalink for accessing the post',
     'timestamp' => 'the timestamp of the post',
+    'is_carousel' => true|false, // only from v2.5
+    'children' => [array of children if from carousel album, each child has `type`, `url`, and `id`] // only from v2.5
 ]
 ```
 
