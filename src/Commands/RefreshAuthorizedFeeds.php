@@ -14,19 +14,21 @@ use Illuminate\Support\Facades\Mail;
 
 class RefreshAuthorizedFeeds extends Command
 {
-    protected $signature = 'instagram-feed:refresh';
+    protected $signature = 'instagram-feed:refresh {feedItems?}';
 
-    protected $description = 'Refreshes all the authorized feeds';
+    protected $description = 'Refreshes all the authorized feeds with an optional number of feed items';
 
     public function handle()
     {
+        $feedItems = $this->input('feedItems') ?? null;
+
         Profile::all()
             ->filter(function ($profile) {
                 return $profile->hasInstagramAccess();
             })
-            ->each(function ($profile) {
+            ->each(function ($profile) use ($feedItems) {
                 try {
-                    $profile->refreshFeed();
+                    $profile->refreshFeed($feedItems);
                 } catch (Exception $e) {
                     if ($e instanceof BadTokenException) {
                         $profile->clearToken();
