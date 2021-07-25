@@ -148,7 +148,7 @@ Note on `type`: This package was intended just to display a simple feed of recen
 
 Obviously the feed needs to be updated, which is exactly what the `refreshFeed()` method on a Profile instance does. This method will return the same kind of collection as the `feed()` method if successful. However, this method will throw an Exception if one happens to occur (network failure, invalid token, etc).
 
-This package includes an artisan command `php artisan instagram-feed:refresh`, that will refresh all authorised profiles, and handle errors if they occur. If you have an email address set in the config, that address will be notified in the case of an error. It is recommended to use Laravel's scheduling features to run this command as frequently as you see fit.
+This package includes an artisan command `php artisan instagram-feed:refresh {limit?}`, that will refresh all authorised profiles, and handle errors if they occur. If you have an email address set in the config, that address will be notified in the case of an error. It is recommended to use Laravel's scheduling features to run this command as frequently as you see fit.
 
 ### Refreshing access tokens
 

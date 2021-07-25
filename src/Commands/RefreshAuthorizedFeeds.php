@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Mail;
 
 class RefreshAuthorizedFeeds extends Command
 {
-    protected $signature = 'instagram-feed:refresh {feedItems?}';
+    protected $signature = 'instagram-feed:refresh {limit?}';
 
     protected $description = 'Refreshes all the authorized feeds with an optional number of feed items';
 
     public function handle()
     {
-        $feedItems = $this->argument('feedItems') ?? 20;
+        $feedItems = $this->argument('limit') ?? 20;
 
         Profile::all()
             ->filter(function ($profile) {
