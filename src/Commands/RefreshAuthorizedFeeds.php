@@ -20,7 +20,7 @@ class RefreshAuthorizedFeeds extends Command
 
     public function handle()
     {
-        $feedItems = $this->input('feedItems') ?? null;
+        $feedItems = $this->argument('feedItems') ?? 20;
 
         Profile::all()
             ->filter(function ($profile) {
