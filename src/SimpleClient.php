@@ -15,10 +15,10 @@ class SimpleClient
 
     public static function get($url)
     {
-        $response = Http::get($url);
+        $response = Http::accept('application/json')->get($url);
 
         if($response->failed()) {
-            $message = $response->json('error', [])['message'] ?? 'unknown error';
+            $message = $response->json('error_message', 'unknown error');
             throw HttpException::new($url, $response->status(), $message, $response->json());
         }
 
@@ -27,10 +27,10 @@ class SimpleClient
 
     public static function post($url, $options)
     {
-        $response = Http::post($url, $options);
+        $response = Http::accept('application/json')->asForm()->post($url, $options);
 
         if($response->failed()) {
-            $message = $response->json('error', [])['message'] ?? 'unknown error';
+            $message = $response->json('error_message', 'unknown error');
             throw HttpException::new($url, $response->status(), $message, $response->json());
         }
 

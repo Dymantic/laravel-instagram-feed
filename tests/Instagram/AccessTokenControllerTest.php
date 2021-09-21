@@ -120,7 +120,7 @@ class AccessTokenControllerTest extends TestCase
 
         Http::fake([
             Instagram::REQUEST_ACCESS_TOKEN_URL => Http::response([
-                'error' => ['message' => 'bad test request']
+                'error_message' => 'bad test request'
             ], 400)
         ]);
 

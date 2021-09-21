@@ -60,7 +60,7 @@ class SimpleClientTest extends TestCase
     public function it_throws_an_exception_if_get_request_is_not_a_success()
     {
         Http::fake([
-            'test.test' => Http::response(['error' => ['message' => 'bad test request']], 400)
+            'test.test' => Http::response(['error_message' => 'bad test request'], 400)
         ]);
 
         app()->bind(SimpleClient::class, function() {
@@ -88,7 +88,7 @@ class SimpleClientTest extends TestCase
     public function it_throws_an_exception_if_post_request_is_not_a_success()
     {
         Http::fake([
-            'test.test' => Http::response(['error' => ['message' => 'bad test request']], 500)
+            'test.test' => Http::response(['error_message' => 'bad test request'], 500)
         ]);
 
         $expected_message = "Http request to https://test.test failed with a status of 500 and error message: bad test request";
