@@ -28,9 +28,9 @@ class InstagramTest extends TestCase
 
         config([
             'instagram-feed' => [
-                'client_id'     => 'TEST_CLIENT_ID',
-                'client_secret' => 'TEST_CLIENT_SECRET',
-                'auth_callback_route'  => 'instagram'
+                'client_id'           => 'TEST_CLIENT_ID',
+                'client_secret'       => 'TEST_CLIENT_SECRET',
+                'auth_callback_route' => 'instagram'
             ]
         ]);
     }
@@ -75,7 +75,6 @@ class InstagramTest extends TestCase
         $this->assertEquals($expected, $uri);
     }
 
-    
 
     /**
      * @test
@@ -98,7 +97,7 @@ class InstagramTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_gets_user_details_from_short_lived_token()
     {
@@ -118,7 +117,7 @@ class InstagramTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_can_exchange_a_short_lived_token_for_a_long_lived_token()
     {
@@ -139,7 +138,7 @@ class InstagramTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_can_refresh_a_long_lived_token()
     {
@@ -158,14 +157,15 @@ class InstagramTest extends TestCase
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_can_fetch_media_for_a_given_access_token()
     {
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
-        $expected_url = sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, 88, $token->access_code);
+        $expected_url = sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, 88,
+            $token->access_code);
 
         Http::fake([
             'https://graph.instagram.com/*' => Http::response($this->exampleMediaResponse()),
@@ -175,53 +175,30 @@ class InstagramTest extends TestCase
 
         $feed = $instagram->fetchMedia($token, $limit = 88);
 
-        Http::assertSent(function(Request $request) use ($expected_url) {
+        Http::assertSent(function (Request $request) use ($expected_url) {
             return urldecode($request->url()) === $expected_url;
         });
 
-        $expected = [
-            [
-                'type' => 'image',
-                'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F',
-                'caption' => "test caption one",
-                'id' => '17853951361863258',
-                'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
-                'timestamp' => '',
-            ],
-            [
-                'type' => 'image',
-                'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
-                'id' => '18046738186210442',
-                'caption' => "test caption two",
-                'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
-                'timestamp' => '',
-            ],
-            [
-                'type' => 'video',
-                'url' => 'https://video.xx.fbcdn.net/v/t50.2886-16/80075364_501004160505270_3520263354313331489_n.mp4?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=fXXNJuZcyXEAX8rD8l8&_nc_ht=video.xx&oh=e1cbd15a0f23db1f7d5a5f6ddd2ace83&oe=5E9400C7',
-                'id' => '18068269231170160',
-                'caption' => "test caption three",
-                'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
-                'timestamp' => '',
-            ],
-            [
-                'type' => 'video',
-                'url' => 'https://video.xx.fbcdn.net/v/t50.2886-16/79391351_481629065798947_3744187809422239413_n.mp4?_nc_cat=102&vs=18083652679083225_3607239704&_nc_vs=HBkcFQAYJEdIZHF1d1FqWldFQkNyWUJBTFhtOWFENUJ2WXpia1lMQUFBRhUAACgAGAAbAYgHdXNlX29pbAExFQAAGAAWsrTUvY%2B%2Fn0AVAigCQzMsF0Ay90vGp%2B%2BeGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHXqBwA%3D&_nc_sid=59939d&efg=eyJ2ZW5jb2RlX3RhZyI6InZ0c192b2RfdXJsZ2VuLjcyMGZlZWQifQ%3D%3D&_nc_ohc=fO8GgEnZ468AX_Fk0Ib&_nc_ht=video.xx&oh=1731b5b44ac7a430e1f90596c15806c3&oe=5E916311&_nc_rid=d477a9015c',
-                'id' => '18033634498224799',
-                'caption' => "test caption four",
-                'permalink' => 'https://www.instagram.com/p/Ab12CDeFgHi/',
-                'timestamp' => '',
-            ]
+        $expected_ids = [
+            "17853951361863258",
+            "18046738186210442",
+            "18068269231170160",
+            "18033634498224799",
         ];
 
+
         $this->assertCount(4, $feed);
-        $this->assertEquals($expected, $feed);
+        $this->assertSame($feed[0]->id, $expected_ids[0]);
+        $this->assertSame($feed[1]->id, $expected_ids[1]);
+        $this->assertSame($feed[2]->id, $expected_ids[2]);
+        $this->assertSame($feed[3]->id, $expected_ids[3]);
     }
 
     /**
      * @test
      */
-    public function it_makes_multiple_calls_to_fetch_up_to_limit() {
+    public function it_makes_multiple_calls_to_fetch_up_to_limit()
+    {
         $profile = Profile::create(['username' => 'test user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
 
@@ -238,26 +215,25 @@ class InstagramTest extends TestCase
 
         $feed = $instagram->fetchMedia($token, $limit = 7);
 
-        Http::assertSent(function(Request $request) use ($expected_initial_url) {
+        Http::assertSent(function (Request $request) use ($expected_initial_url) {
             return urldecode($request->url()) === $expected_initial_url;
         });
 
-        Http::assertSent(function(Request $request) use ($next_url) {
+        Http::assertSent(function (Request $request) use ($next_url) {
             return $request->url() === $next_url;
         });
 
-        
 
         $this->assertCount(7, $feed);
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_ignores_video_posts_if_required_in_config()
     {
         $token = AccessToken::create([
-            'profile_id' => 1,
+            'profile_id'           => 1,
             'access_code'          => 'REFRESHED_LONG_LIVED_TOKEN',
             'username'             => 'instagram_test_username',
             'user_id'              => 'FAKE_USER_ID',
@@ -276,46 +252,27 @@ class InstagramTest extends TestCase
 
         $feed = $instagram->fetchMedia($token);
 
-        Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
+        Http::assertSent(fn(Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
-        $expected = [
-            [
-                'type' => 'image',
-                'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/88377911_489796465235615_7665986482865453688_n.jpg?_nc_cat=103&_nc_sid=8ae9d6&_nc_ohc=yrRAJXdvYI4AX9FZA2-&_nc_ht=scontent.xx&oh=8f5c3ce9f043abfb31fc8b21aefc433e&oe=5E93D95F',
-                'caption' => "test caption one",
-                'permalink' => "https://www.instagram.com/p/Ab12CDeFgHi/",
-                'id' => '17853951361863258',
-                'timestamp' => '',
-            ],
-            [
-                'type' => 'image',
-                'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/80549905_2594006480669195_8926697910974014198_n.jpg?_nc_cat=104&_nc_sid=8ae9d6&_nc_ohc=vLLm_GgfP60AX8td-AL&_nc_ht=scontent.xx&oh=96a59075b998f800c3b1321a6d87b90c&oe=5E915974',
-                'id' => '18046738186210442',
-                "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
-                'caption' => "test caption two",
-                'timestamp' => '',
-            ],
-            [
-                'type' => 'image',
-                'url' => 'https://scontent.xx.fbcdn.net/v/t51.2885-15/73475359_561750917995932_8049459030244731697_n.jpg?_nc_cat=107&_nc_sid=8ae9d6&_nc_ohc=Z2GNsIN-PmQAX_41ocV&_nc_ht=scontent.xx&oh=544f90b575c9fdee92f7590d16c046e7&oe=5E91D790',
-                'id' => '18068269231170160',
-                "permalink" => "https://www.instagram.com/p/Ab12CDeFgHi/",
-                'caption' => "test caption three",
-                'timestamp' => '',
-            ],
+        $expected_ids = [
+            '17853951361863258',
+            '18046738186210442',
+            '18068269231170160',
         ];
 
         $this->assertCount(3, $feed);
-        $this->assertEquals($expected, $feed);
+        $this->assertSame($expected_ids[0], $feed[0]->id);
+        $this->assertSame($expected_ids[1], $feed[1]->id);
+        $this->assertSame($expected_ids[2], $feed[2]->id);
     }
 
     /**
-     *@test
+     * @test
      */
     public function it_can_detect_bad_token_requests_and_throw_a_useful_exception()
     {
         $token = AccessToken::create([
-            'profile_id' => 1,
+            'profile_id'           => 1,
             'access_code'          => 'REFRESHED_LONG_LIVED_TOKEN',
             'username'             => 'instagram_test_username',
             'user_id'              => 'FAKE_USER_ID',
@@ -341,7 +298,9 @@ class InstagramTest extends TestCase
     private function makeMediaUrl($token)
     {
         $limit = 20;
-        return sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, $limit, $token->access_code);
+
+        return sprintf(Instagram::MEDIA_URL_FORMAT, $token->user_id, Instagram::MEDIA_FIELDS, $limit,
+            $token->access_code);
     }
 
 }

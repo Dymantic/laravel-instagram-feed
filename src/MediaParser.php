@@ -6,99 +6,71 @@ namespace Dymantic\InstagramFeed;
 
 class MediaParser
 {
-    public static function parseItem($media, $ignore_video = false)
+    public static function parseItem($media, $ignore_video = false): ?InstagramMedia
     {
-        $type = $media['media_type'];
-
-        switch ($type) {
-            case 'IMAGE':
-                return static::parseAsImage($media);
-
-            case 'VIDEO':
-                return static::parseAsVideo($media, $ignore_video);
-
-            case 'CAROUSEL_ALBUM':
-                return static::parseAsCarousel($media, $ignore_video);
-
-            default:
-                return null;
-        }
+        return match ($media['media_type']) {
+            'IMAGE' => static::parseAsImage($media),
+            'VIDEO' => static::parseAsVideo($media, $ignore_video),
+            'CAROUSEL_ALBUM' => static::parseAsCarousel($media, $ignore_video),
+            default => null,
+        };
     }
 
-    private static function parseAsImage($media)
+    private static function parseAsImage($media): ?InstagramMedia
     {
-        return [
-            'type' => 'image',
-            'url' => $media['media_url'],
-            'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
+        return InstagramMedia::newImage([
+            'url'       => $media['media_url'],
+            'id'        => $media['id'],
+            'caption'   => $media['caption'] ?? '',
             'permalink' => $media['permalink'],
             'timestamp' => $media['timestamp'] ?? ''
-        ];
+        ]);
     }
 
-    private static function parseAsVideo($media, $ignore_video)
+    private static function parseAsVideo($media, $ignore_video): ?InstagramMedia
     {
         if ($ignore_video) {
-            return;
+            return null;
         }
 
-        return [
-            'type' => 'video',
-            'url' => $media['media_url'],
-            'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
-            'permalink' => $media['permalink'],
-            'timestamp' => $media['timestamp'] ?? ''
-        ];
+        return InstagramMedia::newVideo([
+            'url'           => $media['media_url'],
+            'id'            => $media['id'],
+            'caption'       => $media['caption'] ?? '',
+            'permalink'     => $media['permalink'],
+            'timestamp'     => $media['timestamp'] ?? '',
+            'thumbnail_url' => $media['thumbnail_url'],
+        ]);
     }
 
-    private static function parseAsCarousel($media, $ignore_video)
+    private static function parseAsCarousel($media, $ignore_video): ?InstagramMedia
     {
-        $use = collect($media['children']['data'])
-            ->first(function ($child) use ($ignore_video) {
+        $children = collect($media['children']['data'])
+            ->filter(function ($child) use ($ignore_video) {
                 return $child['media_type'] === 'IMAGE' || (!$ignore_video);
             });
-        
-        if (!$use) {
-            return;
+
+        if (!$children->count()) {
+            return null;
         }
 
-        return [
-            'type' => strtolower($use['media_type']),
-            'url' => $use['media_url'],
-            'id' => $media['id'],
-            'caption' => (array_key_exists('caption', $media) ? $media['caption'] : null),
+        $use = $children->first();
+
+        return InstagramMedia::newCarousel([
+            'type'      => strtolower($use['media_type']),
+            'url'       => $use['media_url'],
+            'id'        => $media['id'],
+            'caption'   => $media['caption'] ?? '',
             'permalink' => $media['permalink'],
-            'timestamp' => $media['timestamp'] ?? ''
-        ];
-    }
+            'timestamp' => $media['timestamp'] ?? '',
+            'children'  => $children->map(function ($child) {
+                return [
+                    'type' => strtolower($child['media_type']),
+                    'url'  => $child['media_url'],
+                    'id'   => $child['id'],
+                ];
+            })->values()->all(),
+        ]);
 
-    private static function firstCarouselItem($media, $ignore_video)
-    {
-        return collect($media['carousel_media'])
-            ->first(function ($item) use ($ignore_video) {
-                return !$ignore_video || ($item["images"] ?? false);
-            });
-    }
-
-    private static function extractVideo($media)
-    {
-        return [
-            'type' => 'video',
-            'low' => $media['low_bandwidth']['url'] ?? null,
-            'thumb' => $media['low_resolution']['url'] ?? null,
-            'standard' => $media['standard_resolution']['url'] ?? null,
-        ];
-    }
-
-    private static function extractImage($media)
-    {
-        return [
-            'type' => 'image',
-            'low' => $media['low_resolution']['url'] ?? null,
-            'thumb' => $media['thumbnail']['url'] ?? null,
-            'standard' => $media['standard_resolution']['url'] ?? null,
-        ];
     }
 }
