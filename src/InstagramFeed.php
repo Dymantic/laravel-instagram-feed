@@ -4,10 +4,8 @@ namespace Dymantic\InstagramFeed;
 
 use ArrayIterator;
 use Countable;
-use Exception;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
-use Traversable;
 
 class InstagramFeed implements IteratorAggregate, Countable
 {
