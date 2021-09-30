@@ -120,13 +120,13 @@ class Profile extends Model
         $this->tokens->each->delete();
     }
 
-    public function feed($limit = 20): Collection
+    public function feed($limit = 20): array
     {
         if(!$this->latestToken()) {
-            return collect([]);
+            return [];
         }
         if (Cache::has($this->cacheKey())) {
-            return collect(Cache::get($this->cacheKey()));
+            return Cache::get($this->cacheKey());
         }
 
         $instagram = App::make(Instagram::class);
@@ -135,13 +135,13 @@ class Profile extends Model
             $feed = $instagram->fetchMedia($this->latestToken(), $limit);
             Cache::forever($this->cacheKey(), $feed);
 
-            return collect($feed);
+            return $feed;
         } catch (Exception $e) {
-            return collect([]);
+            return [];
         }
     }
 
-    public function refreshFeed($limit = 20): Collection
+    public function refreshFeed($limit = 20): array
     {
         $instagram = App::make(Instagram::class);
         $new_feed = $instagram->fetchMedia($this->latestToken(), $limit);

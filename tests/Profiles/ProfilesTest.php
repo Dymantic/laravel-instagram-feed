@@ -251,7 +251,7 @@ class ProfilesTest extends TestCase
 
         Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
-        $this->assertInstanceOf(Collection::class, $feed);
+        $this->assertIsArray($feed);
     }
 
     /**
@@ -282,11 +282,11 @@ class ProfilesTest extends TestCase
         Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
         $this->assertTrue(cache()->has($profile->cacheKey()));
-        $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
 
         $second_call_to_feed = $profile->feed();
 
-        $this->assertEquals($feed->all(), $second_call_to_feed->all());
+        $this->assertEquals($feed, $second_call_to_feed);
     }
 
     /**
@@ -313,7 +313,7 @@ class ProfilesTest extends TestCase
             fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token, 44)
         );
         $this->assertCount(4, $feed);
-        $this->assertEquals($feed->all(), cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
     }
 
     /**
@@ -345,7 +345,7 @@ class ProfilesTest extends TestCase
         ]);
 
         $feed = $profile->feed();
-        $this->assertEquals([], $feed->all());
+        $this->assertEquals([], $feed);
     }
 
     /**
