@@ -4,7 +4,9 @@
 
 ## Easily include your Instagram feed(s) in your project.
 
-The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project, using Instagram's Basic Display API. The package is made so that ideally the view is almost always just using cached data, and the feed itself will be updated at a schedule of your choosing, using Laravel's great scheduling features. The feed is also designed to be resilient, so that you can safely call it from your controllers without having to worry about network errors breaking the page.
+The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project, using Instagram's Basic Display API. The package stores the feed in your cache, and provides you with the ability to refresh your feeds on whatever schedule suits you.
+
+**Note** This package requires PHP 8. If that is not your cup of tea, then you may continue to use v2.
 
 ### Installation
 
@@ -12,9 +14,9 @@ The aim of this package is to make it as simple and user-friendly as possible to
 composer require dymantic/laravel-instagram-feed
 ```
 
-**Note** You will need to use ^v2.0, as v1 used the old Legacy API which has been shut down.
+**Note** If you are upgrading from v2.*, refer to the upgrading guide, as there are breaking changes.
 
-**Breaking changes from v1:** The feed now consists of entries that only contain the media type, media url, caption, id and permalink. Additionally, when completing the auth flow, the token no longer contains the users full name or avatar as the Basic Display API doesn't provide this. I am open to the idea of separately scraping for that data, but not planning on doing it right now. You will also need to refresh your tokens, which expire every 60 days. See further down for more on that.
+
 
 ## Tutorial
 
@@ -26,7 +28,7 @@ To use the Instagram Basic Display API, you will need to have a Facebook app set
 
 ### How Instagram Media is Handled
 
-Instagram provides three media types through this API: image, video and carousel. This package simplifies that into just a feed of images and videos. You may use the `ignore_video` config option if you don't want to include any videos. For carousel items, the first item of the carousel is used. If video is to be ignored, and the first image will be used, if it exists.
+Instagram provides three media types through this API: image, video and carousel. This package simplifies that into just a feed of images and videos. You may use the `ignore_video` config option if you don't want to include any videos. For carousel items, the first item of the carousel is used. If video is to be ignored, and the first image will be used, if it exists. Carousel items have a `children` property, which includes the actual carousel items.
 
 ##### Note on ignoring video
 
@@ -100,13 +102,23 @@ return [
 
 ### Profiles
 
-All Instagram api calls now need auth via OAuth, and so you need an entity to associate the resulting access token with. This package provides a `Dymantic\InstagramFeed\Profile` model to fit that role. An instance of the model requires a username, so you have some way to refer to it, and it is through this model that you will access the Instagram feed belonging to the access token granted to the profile. You may have several profiles, which means you may have more than one Instagram feed. How you use the Profiles is up to you (e.i. associating with users, or just having one profile, etc).
+This package provides a `Dymantic\InstagramFeed\Profile` model which corresponds to an Instagram profile/account. You will need to create a profile for each feed you intend to use in your app/site. Once a profile has been created, you will need to authorize the profile before you can fetch its feed.
+
+#### Creating profiles
+
+You may create profiles programmatically in your code as follows. All you need is to provide a unique username for the profile. This **does not** have to match an Instagram username, it can be any name you wish to use to refer to the profile.
+
+````
+$profile = \Dymantic\InstagramFeed\Profile::new('my profile');
+````
 
 Having just a single profile for a project is a fairly common use case, so this package includes an artisan command to quickly create a profile, so that you don't need to build out the necessary UI for your users to do so. Running `php artisan instagram-feed:profile {username}` will create a profile with that username, that you may then use as desired.
 
 ### Getting Authorized
 
-Once you have a profile, you may call the `getInstagramAuthUrl()` method on it to get a link to present to the user that will give authentication. When the user visits that url they can then grant access to your app (or not). If everything goes smoothly, the user will be redirected back to the route you configured. If access is not granted, you will be redirected to the alternate route you configured. If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user (because you are in Sandbox mode), Instagram won't redirect at all, and your user will see an error page from Instagram.
+Once you have a profile, you may call the `getInstagramAuthUrl()` method on it to get a link to present to the user that will give authentication. When the user visits that url they can then grant access to your app (or not). If everything goes smoothly, the user will be redirected back to the `success_redirect_to` route you set in your config file. If access is not granted, you will be redirected to the `failure_redirect_to` route you configured.
+
+If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user, Instagram won't redirect at all, and your user will see an error from Instagram.
 
 ### Getting the feed
 
