@@ -26,6 +26,11 @@ class Profile extends Model
         return static::CACHE_KEY_BASE . ":" . $this->id;
     }
 
+    public static function new(string $username): self
+    {
+        return self::create(['username' => $username]);
+    }
+
     public static function for(string $username): ?self
     {
         return static::where('username', $username)->first();

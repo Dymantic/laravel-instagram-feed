@@ -6,7 +6,7 @@
 
 The aim of this package is to make it as simple and user-friendly as possible to include your Instagram feed in your project, using Instagram's Basic Display API. The package stores the feed in your cache, and provides you with the ability to refresh your feeds on whatever schedule suits you.
 
-**Note** This package requires PHP 8. If that is not your cup of tea, then you may continue to use v2.
+**Note** This package requires PHP 8. If that is not your cup of tea, then you may continue to use [v2](https://github.com/Dymantic/laravel-instagram-feed/tree/v2.6.0).
 
 ### Installation
 
@@ -14,7 +14,7 @@ The aim of this package is to make it as simple and user-friendly as possible to
 composer require dymantic/laravel-instagram-feed
 ```
 
-**Note** If you are upgrading from v2.*, refer to the upgrading guide, as there are breaking changes.
+**Note** If you are upgrading from v2.*, refer to the [upgrade guide](upgrade.md), as there are breaking changes.
 
 
 
@@ -42,7 +42,7 @@ If you chose to ignore video, your feed size may be smaller than the limit you r
 
 Publishing the vendor assets as described above will give you a `config/instagram-feed.php` file. You will need to add your config before you can get started. The comments in the file explain each of the settings.
 
-```
+```php
 // config/instagram-feed.php
 
 <?php
@@ -108,7 +108,7 @@ This package provides a `Dymantic\InstagramFeed\Profile` model which corresponds
 
 You may create profiles programmatically in your code as follows. All you need is to provide a unique username for the profile. This **does not** have to match an Instagram username, it can be any name you wish to use to refer to the profile.
 
-````
+````php
 $profile = \Dymantic\InstagramFeed\Profile::new('my profile');
 ````
 
@@ -120,11 +120,30 @@ Once you have a profile, you may call the `getInstagramAuthUrl()` method on it t
 
 If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user, Instagram won't redirect at all, and your user will see an error from Instagram.
 
+#### Refreshing access tokens
+
+The long lived access tokens for the API expire after 60 days. This package includes an artisan command that will handle this for you, you just need to ensure that it runs at least once every 60 days. The command is `php artisan instagram-feed:refresh-tokens`
+
 ### Getting the feed
 
-`Profile::feed($limit = 20)`
+Once your profile has been authenticated, you can retrieve the feed either directly from the `InstagramFeed` class, or by first getting the profile and calling the feed method on it.
 
-Once you have an authenticated profile, you may call the `feed()` method on that profile. The first time the method is called the feed will be fetched from Instagram and it will the be cached forever. Consequent calls to the `feed()` method will simply fetch from the cache. The `feed()` method can be safely called without worrying about exceptions and errors, if something goes wrong, you will just receive an empty collection.
+````php
+$feed = \Dymantic\InstagramFeed\InstagramFeed::for('my profile');
+````
+
+or
+
+````php
+$profile = \Dymantic\InstagramFeed\Profile::for('my profile')
+$feed = $profile?->feed();
+````
+
+Once the feed is fetched, it will be cached forever and the same cached results will be returned until you `refresh` the feed. Normally this is done is a scheduled chron job.
+
+##### Limiting the number of items in the feed
+
+By default, the number of items in the feed is 20. You may pass an optional integer parameter when getting your feed, as such: `\Dymantic\InstagramFeed\InstagramFeed::for('my profile', 15)` or `$profile?->feed(15)` to limit the feed to that amount.
 
 ##### Fetching all posts (no limit)
 
@@ -132,31 +151,72 @@ If you want to fetch all your posts (up to the last 1000), you may pass `null` a
 
 ##### Setting limits, and cache
 
-You can set the limit for the returned media items by passing your limit to the feed method. So if you want a limit of 66, you would do: `$profile->feed(66)`. Once your feed has been fetched, it will be cached, and this result is what will be returned when future calls to the feed methods are made. This means if you want to increase your limit, for example to 88, you will have to call `$profile->refreshFeed(88)`
+When the feed is being supplied from the cache, the limit will have no affect. If you would like to change the limit to what you previously used, you will have to `refresh` the feed.
 
-Remember that if you chose to ignore video, your feed size may be smaller than the limit you requested. If you expect to be ignoring video posts you may want to increase how many posts you fetch.
+##### Setting limits and ignore_video
 
-The feed will be a Laravel collection of items that have the following structure:
+If you chose to ignore video, your feed size may be smaller than the limit you requested. If you expect to be ignoring video posts you may want to increase how many posts you fetch.
 
-```
-[
-    'type' => 'image' // can be either image or video
-    'url' => 'source url for media',
-    'id' => 'the media id',
-    'caption' => 'the media caption',
-    'permalink' => 'the permalink for accessing the post',
-    'timestamp' => 'the timestamp of the post',
-]
-```
 
 ### Updating the feed
 
-`Profile::refreshFeed($limit = 20)`
+You may refresh the feed similar to how you fetch the reed:
 
-Obviously the feed needs to be updated, which is exactly what the `refreshFeed()` method on a Profile instance does. This method will return the same kind of collection as the `feed()` method if successful. However, this method will throw an Exception if one happens to occur (network failure, invalid token, etc).
+````php
+$feed = \Dymantic\InstagramFeed\InstagramFeed::for('my profile')->refresh();
+````
 
-This package includes an artisan command `php artisan instagram-feed:refresh`, that will refresh all authorised profiles, and handle errors if they occur. If you have an email address set in the config, that address will be notified in the case of an error. It is recommended to use Laravel's scheduling features to run this command as frequently as you see fit.
+or
 
-### Refreshing access tokens
+````php
+$profile = \Dymantic\InstagramFeed\Profile::for('my profile')
+$feed = $profile?->refreshFeed();
+````
 
-The long lived access tokens for the API expire after 60 days. This package includes an artisan command that will handle this for you, you just need to ensure that it runs at least once every 60 days. The command is `php artisan instagram-feed:refresh-tokens`
+Refreshing the feed returns an instance of `InstagramFeed`, however, unlike getting the normal feed, this method can throw an exception if an error occurs. The idea is that you refresh your feeds in the background somewhere, usually in a scheduled job. This package includes an artisan command `php artisan instagram-feed:refresh`, that will refresh all authorised profiles, and handle errors if they occur. If you have an email address set in the config, that address will be notified in the case of an error. It is recommended to use Laravel's scheduling features to run this command as frequently as you see fit.
+
+## Using the feed
+
+Once you have a feed, you may send it to your view, where it may be iterated over, with each item in the feed being an instance of the `InstagramMedia` class.
+
+````php
+// somewhere in a Controller
+public function show() {
+    $feed = \Dymantic\InstagramFeed\InstagramFeed::for('my profile');
+    
+    return view('instagram-feed', ['instagram_feed' => $feed]);
+}
+
+// instagram-feed.blade.php
+
+@foreach($instagram_feed as $post)
+    <img src={{ $post->url }} alt="A post from my instagram">
+@endforeach
+````
+If you would like more control over the feed's items, you may call the `collect` method on the feed to retrieve the feed items as a Laravel Collection.
+
+#### Feed items
+
+Each feed item is an instance of the `InstagramMedia` class and provides the following properties and methods:
+
+| property | type | value |
+| --- |--- | --- |
+| type | string | either "image", "video" or "carousel" |
+| url | string | the url for the image or video |
+| id | string | the Instagram id for the image or video |
+| caption | string | caption for the post |
+| permalink | string | permalink to post on instagram.com |
+| thumbnail_url | string | the url for the video thumbnail. Only on video items |
+| timestamp | string | the timestamp for the post |
+| children | array | For Carousel type posts. Each item will contain only `id`, `url` and `type` fields. Will be empty array for non-carousel posts.  |
+
+| method | return | notes |
+| --- | --- | --- |
+| isImage() | bool | is the post of "image" type |
+| isVideo() | bool | is the post of "video" type |
+| isCarousel() | bool | is the post of "carousel" type |
+| toArray() | array | get the item in array form |
+
+
+
+
