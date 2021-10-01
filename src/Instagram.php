@@ -5,6 +5,7 @@ namespace Dymantic\InstagramFeed;
 
 
 use Dymantic\InstagramFeed\Exceptions\BadTokenException;
+use Dymantic\InstagramFeed\Exceptions\HttpException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Config;
 
@@ -21,15 +22,12 @@ class Instagram
     private $client_id;
     private $client_secret;
     private $redirect_uri;
-    private $http;
 
-    public function __construct($config, $client)
+    public function __construct($config)
     {
         $this->client_id = $config["client_id"];
         $this->client_secret = $config["client_secret"];
         $this->redirect_uri = $config["auth_callback_route"];
-
-        $this->http = $client;
     }
 
     public function authUrlForProfile($profile)
@@ -37,7 +35,7 @@ class Instagram
         $client_id = $this->client_id;
         $redirect = $this->redirectUriForProfile($profile->id);
 
-        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code&state={$profile->id}";
+        return "https://api.instagram.com/oauth/authorize/?client_id=$client_id&redirect_uri=$redirect&scope=user_profile,user_media&response_type=code&state={$profile->identity_token}";
     }
 
     private function redirectUriForProfile($profile_id)
@@ -50,7 +48,7 @@ class Instagram
 
     public function requestTokenForProfile($profile, $auth_request)
     {
-        return $this->http->post(static::REQUEST_ACCESS_TOKEN_URL, [
+        return SimpleClient::post(static::REQUEST_ACCESS_TOKEN_URL, [
             'client_id' => $this->client_id,
             'client_secret' => $this->client_secret,
             'grant_type' => 'authorization_code',
@@ -62,20 +60,20 @@ class Instagram
     public function fetchUserDetails($access_token)
     {
         $url = sprintf(self::GRAPH_USER_INFO_FORMAT, $access_token['user_id'], $access_token['access_token']);
-        return $this->http->get($url);
+        return SimpleClient::get($url);
     }
 
     public function exchangeToken($short_token)
     {
         $url = sprintf(self::EXCHANGE_TOKEN_FORMAT, $this->client_secret, $short_token['access_token']);
 
-        return $this->http->get($url);
+        return SimpleClient::get($url);
     }
 
     public function refreshToken($token)
     {
         $url = sprintf(self::REFRESH_TOKEN_FORMAT, $token);
-        return $this->http->get($url);
+        return SimpleClient::get($url);
     }
 
     /**
@@ -133,9 +131,9 @@ class Instagram
     private function fetchResponseData($url)
     {
         try {
-            return $response = $this->http->get($url);
-        } catch (ClientException $e) {
-            $response = json_decode($e->getResponse()->getBody(), true);
+            return $response = SimpleClient::get($url);
+        } catch (HttpException $e) {
+            $response = $e->getResponse();
             $error_type = $response['meta']['error_type'] ?? 'unknown';
             if ($error_type === 'OAuthAccessTokenException') {
                 throw new BadTokenException('The token is invalid');

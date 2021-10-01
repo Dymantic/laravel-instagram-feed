@@ -11,6 +11,7 @@ use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
 use Dymantic\InstagramFeed\Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
 
 class RefreshTokensCommandTest extends TestCase
 {
@@ -35,18 +36,10 @@ class RefreshTokensCommandTest extends TestCase
             'access_code' => 'VALID_LONG_LIVED_TOKEN',
         ]);
 
-        $mockClient = $this->createMock(SimpleClient::class);
-        $mockClient->expects($this->exactly(2))
-                   ->method('get')
-                   ->with($this->equalTo($this->makeRefreshUrl($tokenA)))
-                   ->willReturn($this->refreshedLongLivedToken());
-
-        $mockClient->expects($this->exactly(2))
-                   ->method('get')
-                   ->with($this->equalTo($this->makeRefreshUrl($tokenA)))
-                   ->willReturn($this->refreshedLongLivedToken());
-
-        app()->instance(SimpleClient::class, $mockClient);
+        Http::fake([
+            $this->makeRefreshUrl($tokenA) => $this->refreshedLongLivedToken(),
+            $this->makeRefreshUrl($tokenB) => $this->refreshedLongLivedToken(),
+        ]);
 
         Artisan::call('instagram-feed:refresh-tokens');
 

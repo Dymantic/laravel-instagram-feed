@@ -8,9 +8,11 @@ use Dymantic\InstagramFeed\Exceptions\AccessTokenRequestException;
 use Dymantic\InstagramFeed\Exceptions\RequestTokenException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Profile extends Model
 {
@@ -24,9 +26,34 @@ class Profile extends Model
         return static::CACHE_KEY_BASE . ":" . $this->id;
     }
 
-    public function getInstagramAuthUrl()
+    public static function new(string $username): self
+    {
+        return self::create(['username' => $username]);
+    }
+
+    public static function for(string $username): ?self
+    {
+        return static::where('username', $username)->first();
+    }
+
+    public static function usingIdentityToken(string $token): ?self
+    {
+        return tap(static::where('identity_token', $token)->first(), function($profile) {
+            if($profile) {
+                $profile->identity_token = null;
+                $profile->save();
+            }
+        });
+    }
+
+    public function getInstagramAuthUrl(): string
     {
         $instagram = App::make(Instagram::class);
+
+        if(!$this->identity_token) {
+            $this->identity_token = Str::random(16);
+            $this->save();
+        }
 
         return $instagram->authUrlForProfile($this);
     }
@@ -45,8 +72,6 @@ class Profile extends Model
     public function requestToken($request)
     {
         if ($request->has('error') || !$request->has('code')) {
-            $message = $this->getRequestErrorMessage($request);
-            Log::error(sprintf("Instagram auth error: %s", $message));
             throw new RequestTokenException('Unable to get request token');
         }
 
@@ -57,31 +82,12 @@ class Profile extends Model
             $user_details = $instagram->fetchUserDetails($token_details);
             $token = $instagram->exchangeToken($token_details);
         } catch (Exception $e) {
-            $message = $this->getRequestErrorMessage($request);
-            Log::error(sprintf("Instagram auth error: %s", $message));
             throw new AccessTokenRequestException($e->getMessage());
         }
 
         return $this->setToken(array_merge(['access_token' => $token['access_token']], $user_details));
     }
 
-    private function getRequestErrorMessage($request)
-    {
-        if(!$request->has('error')) {
-            return 'unknown error message';
-        }
-
-        $error = $request->get('error');
-
-        if(is_string($error)) {
-            return $error;
-        }
-
-        if(is_array($error) && array_key_exists('message', $error)) {
-            return $error['message'];
-        }
-        return 'unknown error message';
-    }
 
     public function refreshToken()
     {
@@ -91,10 +97,7 @@ class Profile extends Model
         $this->latestToken()->update(['access_code' => $new_token['access_token']]);
     }
 
-    /**
-     * @param $token_details
-     * @return AccessToken
-     */
+
     protected function setToken($token_details)
     {
         $this->tokens->each->delete();
@@ -102,12 +105,12 @@ class Profile extends Model
         return AccessToken::createFromResponseArray($this, $token_details);
     }
 
-    public function hasInstagramAccess()
+    public function hasInstagramAccess(): bool
     {
         return !! $this->latestToken();
     }
 
-    public function latestToken()
+    public function latestToken(): ?AccessToken
     {
         return $this->tokens()->latest()->first();
     }
@@ -122,13 +125,13 @@ class Profile extends Model
         $this->tokens->each->delete();
     }
 
-    public function feed($limit = 20)
+    public function feed($limit = 20): InstagramFeed
     {
         if(!$this->latestToken()) {
-            return collect([]);
+            return InstagramFeed::empty();
         }
         if (Cache::has($this->cacheKey())) {
-            return collect(Cache::get($this->cacheKey()));
+            return new InstagramFeed($this, Cache::get($this->cacheKey()));
         }
 
         $instagram = App::make(Instagram::class);
@@ -137,13 +140,13 @@ class Profile extends Model
             $feed = $instagram->fetchMedia($this->latestToken(), $limit);
             Cache::forever($this->cacheKey(), $feed);
 
-            return collect($feed);
+            return new InstagramFeed($this, $feed);
         } catch (Exception $e) {
-            return collect([]);
+            return InstagramFeed::empty();
         }
     }
 
-    public function refreshFeed($limit = 20)
+    public function refreshFeed($limit = 20): InstagramFeed
     {
         $instagram = App::make(Instagram::class);
         $new_feed = $instagram->fetchMedia($this->latestToken(), $limit);
@@ -154,7 +157,7 @@ class Profile extends Model
         return $this->feed();
     }
 
-    public function viewData()
+    public function viewData(): array
     {
         $token = $this->tokens->first();
         return [

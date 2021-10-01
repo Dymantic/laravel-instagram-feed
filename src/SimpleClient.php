@@ -5,30 +5,35 @@ namespace Dymantic\InstagramFeed;
 
 
 use Dymantic\InstagramFeed\Exceptions\BadTokenException;
+use Dymantic\InstagramFeed\Exceptions\HttpException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Http;
 
 class SimpleClient
 {
 
-    private $client;
-
-    public function __construct($client)
+    public static function get($url)
     {
-        $this->client = $client;
+        $response = Http::accept('application/json')->get($url);
+
+        if($response->failed()) {
+            $message = $response->json('error_message', 'unknown error');
+            throw HttpException::new($url, $response->status(), $message, $response->json());
+        }
+
+        return $response->json();
     }
 
-    public function get($url)
+    public static function post($url, $options)
     {
-        $response = $this->client->get($url);
+        $response = Http::accept('application/json')->asForm()->post($url, $options);
 
-        return \GuzzleHttp\json_decode($response->getBody(), true, 512, JSON_BIGINT_AS_STRING);
-    }
+        if($response->failed()) {
+            $message = $response->json('error_message', 'unknown error');
+            throw HttpException::new($url, $response->status(), $message, $response->json());
+        }
 
-    public function post($url, $options)
-    {
-        $response = $this->client->post($url, [RequestOptions::FORM_PARAMS => $options]);
-
-        return \GuzzleHttp\json_decode($response->getBody(), true);
+        return $response->json();
     }
 }

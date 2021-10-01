@@ -4,6 +4,8 @@
 namespace Dymantic\InstagramFeed\Tests;
 
 
+use Illuminate\Http\Request;
+
 trait FakesInstagramCalls
 {
     private function successAuthRequest()
@@ -31,19 +33,7 @@ trait FakesInstagramCalls
 
     private function deniedAuthRequest()
     {
-        return new class {
-            public function get($reqParameter)
-            {
-                if ($reqParameter === 'error') {
-                    return 'access_denied';
-                }
-            }
-
-            public function has($reqParameter)
-            {
-                return $reqParameter === 'error';
-            }
-        };
+        return tap(new Request(), fn (Request $r) => $r->replace(['error' => 'access denied']));
     }
 
     private function apiErrorDetails($message) {
