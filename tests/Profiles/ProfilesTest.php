@@ -6,6 +6,7 @@ use Dymantic\InstagramFeed\AccessToken;
 use Dymantic\InstagramFeed\Exceptions\AccessTokenRequestException;
 use Dymantic\InstagramFeed\Exceptions\RequestTokenException;
 use Dymantic\InstagramFeed\Instagram;
+use Dymantic\InstagramFeed\InstagramFeed;
 use Dymantic\InstagramFeed\Profile;
 use Dymantic\InstagramFeed\SimpleClient;
 use Dymantic\InstagramFeed\Tests\FakesInstagramCalls;
@@ -238,7 +239,7 @@ class ProfilesTest extends TestCase
     /**
      *@test
      */
-    public function the_feed_is_returned_as_a_collection()
+    public function the_feed_is_returned_as_an_InstagramFeed()
     {
         $profile = Profile::create(['username' => 'test_user']);
         $token = AccessToken::createFromResponseArray($profile, $this->validUserWithToken());
@@ -251,7 +252,7 @@ class ProfilesTest extends TestCase
 
         Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
-        $this->assertIsArray($feed);
+        $this->assertInstanceOf(InstagramFeed::class, $feed);
     }
 
     /**
@@ -282,7 +283,7 @@ class ProfilesTest extends TestCase
         Http::assertSent(fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token));
 
         $this->assertTrue(cache()->has($profile->cacheKey()));
-        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed->collect()->all(), cache()->get($profile->cacheKey()));
 
         $second_call_to_feed = $profile->feed();
 
@@ -313,7 +314,7 @@ class ProfilesTest extends TestCase
             fn (Request $r) => urldecode($r->url()) === $this->makeMediaUrl($token, 44)
         );
         $this->assertCount(4, $feed);
-        $this->assertEquals($feed, cache()->get($profile->cacheKey()));
+        $this->assertEquals($feed->collect()->all(), cache()->get($profile->cacheKey()));
     }
 
     /**
@@ -345,7 +346,8 @@ class ProfilesTest extends TestCase
         ]);
 
         $feed = $profile->feed();
-        $this->assertEquals([], $feed);
+        $this->assertCount(0, $feed);
+        $this->assertNull($feed->profile);
     }
 
     /**

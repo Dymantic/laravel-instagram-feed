@@ -19,7 +19,12 @@ class InstagramFeed implements IteratorAggregate, Countable
             $profile = Profile::for($profile);
         }
 
-        return new self($profile, $profile?->feed($limit) ?? []);
+        return new $profile ? $profile->feed($limit) : self::empty();
+    }
+
+    public static function empty(): InstagramFeed
+    {
+        return new self(null, []);
     }
 
     public function collect(): Collection
@@ -30,7 +35,7 @@ class InstagramFeed implements IteratorAggregate, Countable
     public function refresh(int $limit = 20): void
     {
         if($this->profile) {
-            $this->items = $this->profile->refreshFeed($limit);
+            $this->items = $this->profile->refreshFeed($limit)->collect()->all();
         }
     }
 
