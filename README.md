@@ -15,6 +15,7 @@ composer require dymantic/laravel-instagram-feed
 ```
 
 **Note** If you are upgrading from v2.\*, refer to the [upgrade guide](upgrade.md), as there are breaking changes.
+**Also Note** This version requires PHP 8 and up, so if you are still on PHP 7 and don't specify a version when you install, composer will pull in ^v2, in which case you should be reading [this page](https://github.com/Dymantic/laravel-instagram-feed/tree/v2.6.0).
 
 ## Tutorial
 
