@@ -166,8 +166,6 @@ class Instagram
 
     /**
      * Configure Instagram Feed to not register its routes.
-     *
-     * @return static
      */
     public static function ignoreRoutes()
     {
