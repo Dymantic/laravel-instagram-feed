@@ -43,7 +43,9 @@ class InstagramFeedServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        if (Instagram::$registersRoutes) {
+            $this->loadRoutesFrom(__DIR__.'/routes.php');
+        }
 
         $this->loadViewsFrom(__DIR__.'/../views', 'instagram-feed');
 
