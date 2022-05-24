@@ -119,6 +119,10 @@ Once you have a profile, you may call the `getInstagramAuthUrl()` method on it t
 
 If you have not set your client_id and/or client_secret correctly, or your Instagram app does not accept the user, Instagram won't redirect at all, and your user will see an error from Instagram.
 
+#### Ignoring the default auth callback route
+
+In some cases you may need to ignore the auth callback route from your config so that you may handle that route yourself, To do this you may call `Instgram::ignoreRoutes()` from within your `AppServiceProvider`,
+
 #### Refreshing access tokens
 
 The long lived access tokens for the API expire after 60 days. This package includes an artisan command that will handle this for you, you just need to ensure that it runs at least once every 60 days. The command is `php artisan instagram-feed:refresh-tokens`
