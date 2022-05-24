@@ -23,6 +23,13 @@ class Instagram
     private $client_secret;
     private $redirect_uri;
 
+    /**
+     * Indicates if Instagram Feed routes will be registered.
+     *
+     * @var bool
+     */
+    public static $registersRoutes = true;
+
     public function __construct($config)
     {
         $this->client_id = $config["client_id"];
@@ -155,5 +162,13 @@ class Instagram
     {
         $max = $limit ?? 1000;
         return ($previous_response['paging']['next'] ?? false) && ($current_count <= $max);
+    }
+
+    /**
+     * Configure Instagram Feed to not register its routes.
+     */
+    public static function ignoreRoutes()
+    {
+        static::$registersRoutes = false;
     }
 }
