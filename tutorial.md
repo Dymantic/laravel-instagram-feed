@@ -26,7 +26,7 @@ First, we need a route to a page where we will present a link for our Instagram 
 // You can leave off the ->middleware('auth') part for now if you don't want to bother with restricting access for now
 Route::get('instagram-get-auth', 'InstgramAuthController@show')->middleware('auth');
 
-//in InsatgramAuthController.php
+//in InstagramAuthController.php
 public function show() {
     $profile = \Dymantic\InstagramFeed\Profile::where('username', 'michael')->first();
 
