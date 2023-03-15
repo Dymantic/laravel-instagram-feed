@@ -94,7 +94,7 @@ class Instagram
         $url = sprintf(
             self::MEDIA_URL_FORMAT,
             $token->user_id,
-            self::MEDIA_FIELDS,
+            urlencode(self::MEDIA_FIELDS),
             $this->getPageSize($limit),
             $token->access_code
         );
