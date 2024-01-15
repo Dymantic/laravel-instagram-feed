@@ -100,6 +100,16 @@ class Profile extends Model
         $this->latestToken()->update(['access_code' => $new_token['access_token']]);
     }
 
+    public function refreshMediaCount()
+    {
+        $instagram = App::make(Instagram::class);
+        $token = $this->latestToken();
+        $user_details = $instagram->fetchUserDetails($token);
+
+        $this->media_count = $user_details['media_count'] ?? 0;
+        $this->save();
+    }
+
 
     protected function setToken($token_details)
     {
