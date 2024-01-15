@@ -14,6 +14,7 @@ class CreateInstagramBasicProfileTable extends Migration
         Schema::create('dymantic_instagram_basic_profiles', function (Blueprint $table) {
             $table->increments('id');
             $table->string('username')->unique();
+            $table->integer('media_count')->default(0);
             $table->string('identity_token')->nullable();
             $table->nullableTimestamps();
         });

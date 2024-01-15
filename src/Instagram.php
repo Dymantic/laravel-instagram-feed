@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Config;
 class Instagram
 {
     const REQUEST_ACCESS_TOKEN_URL = "https://api.instagram.com/oauth/access_token";
-    const GRAPH_USER_INFO_FORMAT = "https://graph.instagram.com/%s?fields=id,username&access_token=%s";
+    const GRAPH_USER_INFO_FORMAT = "https://graph.instagram.com/%s?fields=id,media_count,username&access_token=%s";
     const EXCHANGE_TOKEN_FORMAT = "https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=%s&access_token=%s";
     const REFRESH_TOKEN_FORMAT = "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%s";
     const MEDIA_URL_FORMAT = "https://graph.instagram.com/%s/media?fields=%s&limit=%s&access_token=%s";
@@ -66,7 +66,7 @@ class Instagram
 
     public function fetchUserDetails($access_token)
     {
-        $url = sprintf(self::GRAPH_USER_INFO_FORMAT, $access_token['user_id'], $access_token['access_token']);
+        $url = sprintf(self::GRAPH_USER_INFO_FORMAT, $access_token['user_id'], $access_token['access_token'] ?? $access_token['access_code']);
         return SimpleClient::get($url);
     }
 
