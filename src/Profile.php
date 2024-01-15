@@ -85,6 +85,9 @@ class Profile extends Model
             throw new AccessTokenRequestException($e->getMessage());
         }
 
+        $this->media_count = $user_details['media_count'] ?? 0;
+        $this->save();
+
         return $this->setToken(array_merge(['access_token' => $token['access_token']], $user_details));
     }
 
@@ -162,6 +165,7 @@ class Profile extends Model
         $token = $this->tokens->first();
         return [
             'name'         => $this->username,
+            'media_count'  => $this->media_count,
             'username'     => $token->username ?? '',
             'fullname'     => $token->user_fullname ?? '',
             'avatar'       => $token->user_profile_picture ?? '',
