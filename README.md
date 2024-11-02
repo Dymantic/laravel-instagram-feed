@@ -1,4 +1,4 @@
-# Laravel Instagram Feed - Depracated
+# Laravel Instagram Feed - Deprecated
 
 ### No longer maintained
 
