@@ -1,4 +1,8 @@
-# Laravel Instagram Feed
+# Laravel Instagram Feed - Depracated
+
+### No longer maintained
+
+Hi all, unfortunately I no longer have any time nor intention to maintain this repo, and I no longer use it myself. When the Instagram Basic Display shuts down in December 2024 this repo will essentially become useless. If there is a maintained fork or alternative anyone would like to suggest, I will add it here.
 
 [![Build Status](https://travis-ci.org/Dymantic/laravel-instagram-feed.svg?branch=master)](https://travis-ci.org/Dymantic/laravel-instagram-feed)
 
